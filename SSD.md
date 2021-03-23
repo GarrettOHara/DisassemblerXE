@@ -1,5 +1,5 @@
 # Software Design Document
-## Assignment 2 | Disassembler for XE computer
+## Assignment 2 | Linkage Editor for XE computer
 ## CS 530 Lenoard
 
 **Team**
