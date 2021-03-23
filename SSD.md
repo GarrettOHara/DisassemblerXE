@@ -4,17 +4,10 @@
 
 **Team**
 
-$$
 
-\begin{align}
+Vivian Reyes   csscxxxx    RedId: XXXXXXXXX\
+Garrett O'Hara cssc3724    RedId: 822936303
 
-Vivian Reyes    &csscxxxx    &RedId: XXXXXXXXX\\
-
-Garrett O'Hara  &cssc3724    &RedId: 822936303\\
-
-\end{align}
-
-$$
 **Overview & Goals**
 
 Our goal is to create a Linkage Editor. This program will complile a SIC/XE program and resolve all external sybols by using a ESTAB as explained in Chapter 3.
@@ -54,8 +47,4 @@ Project RoadMap
     - Program will be finsihed and edge cases and bugs will be accounted for
 - Submission: April 14th
     - Submission will occur on this date
-
-
-
-<script type="text/javascript" async
-src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+    
