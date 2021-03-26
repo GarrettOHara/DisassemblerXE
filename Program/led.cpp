@@ -27,7 +27,7 @@ int readFile(const char* input){
 int main(int argc, char *argv[]){
     printf("The size of argc is: %d\n",argc);
     if(argc < 2){
-        cout << "User Error: Please specify a listing file to parse" << endl;
+        cout << "Error: Please specify a listing file to parse" << endl;
         return 0;
     } else if(argc > 4){
         cout << "Error: Please provide 1-4 listing files to parse" << endl;
@@ -49,6 +49,33 @@ int main(int argc, char *argv[]){
  * 
  * from: https://stackoverflow.com/questions/3102232/elf-file-format
  * 
- * test
+ * Approach:
  * 
+ * ESTAB
+ * Create a ESTAB in the form of a map or hashtable data structure. 
+ * on the first pass of the linker, parse each file and store the value in the 
+ * map/hashtable along with the absoulte address
+ *  - Absolute address can be calculated by the actual address of the program and 
+ *    the relative address of the symbol
+ * 
+ * Object File:
+ * 
+ * 
+ * Question: 
+ *  - How do we know how long a text record line is
+ *  - How do we know what kind of instruction something is format 3,4?
+ *  - Is calculating the actual address really just the actual address of the
+ *    program + the realative address of the symbol
+ *  - How do we make the header record for the Object File
+ *  - Do we only add the object code for the main program and then put the
+ *    modification records for the external symbol references
+ * 
+ * 
+ * Edge Cases: 
+ *  - External Symbol that is not defined in the EXDEF is encountered
+ *    program must cease execution giving the error (I can see him doing this case)
+ *  - What if first pass we notice that the first file in the arguments list isnt main
+ *    program?
+ *      - I would assume hault execution and sepcify that you need ot have the main program
+ *        first would be enough
  **/
