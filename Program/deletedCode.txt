@@ -1,0 +1,27 @@
+// This function sucks balls
+int testPrint(const char* input){
+    std::ifstream file(input);
+
+    const int DAYS_ARRAY_SIZE = 32;
+
+
+    std::string daysArray[DAYS_ARRAY_SIZE] = {};
+    int tempsArray[2 * DAYS_ARRAY_SIZE] = {};
+
+    int count = 0;
+
+    std::string line;
+    while ( count < DAYS_ARRAY_SIZE && std::getline( file, line ) )
+    {
+        std::istringstream is( line );
+        is >> daysArray[count];
+        is >> tempsArray[2 * count];
+        is >> tempsArray[2 * count + 1];
+    }
+
+    for(const string& i : daysArray){
+        std::cout << i;
+    }
+    std::cout << "\n";
+    return 0;
+}

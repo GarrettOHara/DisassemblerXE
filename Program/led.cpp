@@ -8,15 +8,41 @@
 **/
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <map>
+#include <vector>
 
 using namespace std;
 
-std::map<std::string,int> ESTAB;
+map<string,int> ESTAB;                  // This map emulates a HashTable
+vector<vector<string>> lines = {};      // This 2D vector holds the instructions
+
+
+vector<string> split(const string str, char delim) {
+    vector<string> result;
+    istringstream ss{str};
+    string token;
+    while (getline(ss, token, delim)) {
+        if (!token.empty()) {
+            result.push_back(token);
+        }
+    }
+    return result;
+}
+
+void printInstructions(){
+        for(const vector<string> i : lines){
+        for(const string j : i){
+            cout << j << endl;
+        }
+        cout<<"\n";
+    }
+    return;
+}
 
 /**
  * 
- * This function will call two separate functions named:
+ * This function (readFile) will call two separate functions named:
  * - constructESTAB
  * - constructObjectFile
  * 
@@ -27,35 +53,63 @@ std::map<std::string,int> ESTAB;
  * is through an "unordered map"
  * Documentation:  http://www.cplusplus.com/reference/unordered_map/unordered_map/
  * 
+ * 
+ * New Idea: (This was acheived with the 2D array/vector: lines)
+ * 
+ * Since the ReferenceTable is really not practicle and seems dumb
+ * We can split each line by a space delininator
+ * This way we will have all the information broke into separtate
+ * string literals and store them in a list/vector/array of some type
+ * 
+ * given this sanitized line, we now have valuable information about it like:
+ * - how long is the array
+ *      This will tell us how many instructions/items are in the line perhaps
+ *      understand what kind of instruction it is
+ *      EX:
+ *          - An array with two we know this is like
+ *          00440   END
+ * 
+ * - We can parse the list for a certain instruction like WORD or RESW
+ *      This will tell us if this line declares a Symbol or not
+ *      If so, we can store the index of the array of like 1 (0 formatted)
+ *      as the key in the ESTAB, or update the address value in the ESTAB
+ *      with the local/relative address in the program 
+ * 
+ *      we will probably just throw all of the labels in the EXTDEF and EXTREF 
+ *      lines in the ESTAB, then update the addresses with the actual
+ *      addy of the program and the realtive address of he symbol in the program
  **/
-int readFile(const char* input){
-    
-    std::ifstream file(input);
+void readFile(const char* input){
+    ifstream file(input);
+    string line;
+
     if (file.is_open()) {
-        std::string line;
-        while (std::getline(file, line)) {
-            printf("%s", line.c_str());
+        
+        while (getline(file, line)) {
+            lines.push_back(split(line, ' '));
         }
-        printf("\n");
+
     }
+
     file.close();
-    return 0;
+    return;
 }
 
-int main(int argc, char *argv[]){
+void main(int argc, char *argv[]){
     printf("The size of argc is: %d\n",argc);
     if(argc < 2){
         cout << "Error: Please specify a listing file to parse" << endl;
-        return 0;
+        return;
     } else if(argc > 4){
         cout << "Error: Please provide 1-4 listing files to parse" << endl;
-        return 0;
+        return;
     }
 
     for(int i = 0; i < argc; i++){
         readFile(argv[i]);
     }
-    return 0;
+    printInstructions();
+    return;
 }
 
 /**
