@@ -8,10 +8,28 @@
 **/
 #include <iostream>
 #include <fstream>
+#include <map>
 
 using namespace std;
 
+std::map<std::string,int> ESTAB;
+
+/**
+ * 
+ * This function will call two separate functions named:
+ * - constructESTAB
+ * - constructObjectFile
+ * 
+ * These two functions will do exaclty what you think
+ * 
+ * Data Structures for the ESTAB: HashTable
+ *  - In c++ the easiest/standard lib way of implemnation 
+ * is through an "unordered map"
+ * Documentation:  http://www.cplusplus.com/reference/unordered_map/unordered_map/
+ * 
+ **/
 int readFile(const char* input){
+    
     std::ifstream file(input);
     if (file.is_open()) {
         std::string line;
@@ -42,6 +60,8 @@ int main(int argc, char *argv[]){
 
 /**
  * This is a notes section
+ * 
+ * main method must be at bottom. Probably just when not in a class.
  * 
  * ELF/ in the output is the text file header, is holds entry addresses 
  * which is the first address in a .text region
