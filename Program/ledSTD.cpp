@@ -12,16 +12,16 @@
 #include <map>
 #include <vector>
 
-using namespace std;
+//using namespace std;
 
-map<string,int> ESTAB;                  // This map emulates a HashTable
-vector<vector<string>> lines = {};      // This 2D vector holds the instructions
+std::map<std::string,int> ESTAB;                  // This map emulates a HashTable
+std::vector<std::vector<std::string>> lines = {};      // This 2D vector holds the instructions
 
 
-vector<string> split(const string str, char delim) {
-    vector<string> result;
-    istringstream ss{str};
-    string token;
+std::vector<std::string> split(const std::string str, char delim) {
+    std::vector<std::string> result;
+    std::istringstream ss{str};
+    std::string token;
     while (getline(ss, token, delim)) {
         if (!token.empty()) {
             result.push_back(token);
@@ -31,11 +31,11 @@ vector<string> split(const string str, char delim) {
 }
 
 int printInstructions(){
-        for(const vector<string> i : lines){
-        for(const string j : i){
-            cout << j << endl;
+        for(const std::vector<std::string> i : lines){
+        for(const std::string j : i){
+            std::cout << j << std::endl;
         }
-        cout<<"\n";
+        std::cout<<"\n";
     }
     return 0;
 }
@@ -80,8 +80,8 @@ int printInstructions(){
  *      addy of the program and the realtive address of he symbol in the program
  **/
 int readFile(const char* input){
-    ifstream file(input);
-    string line;
+    std::ifstream file(input);
+    std::string line;
     if (file.is_open()) {
         
         while (getline(file, line)) {
@@ -96,10 +96,10 @@ int readFile(const char* input){
 int main(int argc, char *argv[]){
     printf("The size of argc is: %d\n",argc);
     if(argc < 2){
-        cout << "Error: Please specify a listing file to parse" << endl;
+        std::cout << "Error: Please specify a listing file to parse" << std::endl;
         return 0;
     } else if(argc > 4){
-        cout << "Error: Please provide 1-4 listing files to parse" << endl;
+        std::cout << "Error: Please provide 1-4 listing files to parse" << std::endl;
         return 0;
     }
 
