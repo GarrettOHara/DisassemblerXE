@@ -14,7 +14,19 @@
 
 using namespace std;
 
+/**
+ * This Unordered map Data Structure holds the Symbol name as the key
+ * and the address as the value
+ * 
+ * ISSUE: The integer needs be be expressed as a HEX value
+ **/
 map<string,int> ESTAB;                  // This map emulates a HashTable
+
+/**
+ * This 2D data structure is used store all of the instructions as
+ * tokenized strings. Each vector is an instruction line. Each vector is 
+ * stored in the main vector calle `lines` 
+ **/
 vector<vector<string>> lines = {};      // This 2D vector holds the instructions
 
 
@@ -38,6 +50,33 @@ int printInstructions(){
         cout<<"\n";
     }
     return 0;
+}
+
+void populateESTAB(){
+    /**
+     * This function needs to parse the lines vector for
+     * EXTDEF and EXTREF then adds all the symbols defined here
+     * to the ESTAB with the addresses realative to the program.
+     * 
+     * When the symbol is parsed in the first pass of the linker, the 
+     * actual address is updated in the ESTAB
+     **/
+    return;
+}
+
+void writeObjectFile(){
+    /**
+     * How to do this? each record type could be a new funciton
+     * 
+     * Create Head record
+     * 
+     * Create Text record
+     * 
+     * Create Mod record
+     * 
+     * Create End record
+     **/
+    return;
 }
 
 /**
@@ -129,6 +168,12 @@ int main(int argc, char *argv[]){
  * map/hashtable along with the absoulte address
  *  - Absolute address can be calculated by the actual address of the program and 
  *    the relative address of the symbol
+ * 
+ * 
+ * Helpful Resources: 
+ * Page 143 in the textbook (159 of PDF)
+ * Shows the "toString" of the ESTAB which can also be refered to as load map
+ * 
  * 
  * Object File
  * 
