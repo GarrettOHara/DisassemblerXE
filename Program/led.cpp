@@ -14,13 +14,26 @@
 
 using namespace std;
 
+
+/**
+ * Non initialized values could run into a runtime error
+ * because there is no constructor
+ **/
+struct ESTABstruct{
+    string controlSection;
+    unsigned int address;
+    unsigned int length;    
+};
+
 /**
  * This Unordered map Data Structure holds the Symbol name as the key
  * and the address as the value
  * 
  * ISSUE: The integer needs be be expressed as a HEX value
+ * 
+ * Store a STRUCT as a value
  **/
-map<string,int> ESTAB;                  // This map emulates a HashTable
+map<string,ESTABstruct> ESTAB;           // This map emulates a HashTable
 
 /**
  * This 2D data structure is used store all of the instructions as
@@ -64,6 +77,13 @@ void populateESTAB(){
     return;
 }
 
+//Notes: need to figure when we start a new text record (max size or format 4?)
+/**
+ * Header Record: H, string of program name, starting address, length of program
+ * Text Record: T, starting address of text record, length of text record line, object codes
+ * Modification Record: M, relocation address, length, flag, segment name
+ * End Record: E, starting address (only first control section/main program has end record)
+ */
 void writeObjectFile(){
     /**
      * How to do this? each record type could be a new funciton
@@ -142,7 +162,7 @@ int main(int argc, char *argv[]){
         return 0;
     }
 
-    for(int i = 0; i < argc; i++){
+    for(int i = 1; i < argc; i++){
         readFile(argv[i]);
     }
     printInstructions();
@@ -195,4 +215,13 @@ int main(int argc, char *argv[]){
  *    program?
  *      - I would assume hault execution and sepcify that you need ot have the main program
  *        first would be enough
+ * 
+ * To Do's:
+ *  - understand how texts records are generated (and header, mod, and end records)
+ *  - how to read and store important values from listing files/source code
+ *  - Garret idea: working on split function that will split ever line into strings and each 
+ * line will be stored in a vector of vectors 
+ *  - let's start brainstorming what exactly the object file needs
+ * 
+ * 
  **/

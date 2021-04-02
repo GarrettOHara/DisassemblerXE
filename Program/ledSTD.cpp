@@ -14,7 +14,7 @@
 
 //using namespace std;
 
-std::map<std::string,int> ESTAB;                  // This map emulates a HashTable
+std::map<std::string,int> ESTAB;                       // This map emulates a HashTable
 std::vector<std::vector<std::string>> lines = {};      // This 2D vector holds the instructions
 
 
