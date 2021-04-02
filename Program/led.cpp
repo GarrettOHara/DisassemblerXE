@@ -11,6 +11,7 @@
 #include <sstream>
 #include <map>
 #include <vector>
+//trying to include regex c++ lib #include <boost/regex.hpp>
 
 using namespace std;
 
@@ -24,6 +25,32 @@ struct ESTABstruct{
     unsigned int address;
     unsigned int length;    
 };
+
+/**
+ * This Struct holds the data associated with each instruction
+ **/
+struct Instruction{
+    unsigned int relativeAddress;
+    string symbolName;
+    string instruction;
+    string arguments;
+    unsigned int objectCode;
+};
+
+/**
+ * This unordered map/Hash map Data Structure will hold all of the instructions
+ * in the source program
+ * 
+ * KEY:     realtive address in the program
+ * 
+ * Issues with relative address as the key:
+ * - some instructions dont have an address
+ * - some instructions do not increment the memory location (creates duplicates of memory)
+ * Both of these issues break the map in a fundemental manner
+ * 
+ * VALUE:   each value is an instruction struct obj
+ **/
+map<string,Instruction> instructions;
 
 /**
  * This Unordered map Data Structure holds the Symbol name as the key
@@ -42,7 +69,7 @@ map<string,ESTABstruct> ESTAB;           // This map emulates a HashTable
  **/
 vector<vector<string>> lines = {};      // This 2D vector holds the instructions
 
-
+// std::regex re(","); NEED to change the char delim to a regex obj for multiple deliminators
 vector<string> split(const string str, char delim) {
     vector<string> result;
     istringstream ss{str};
