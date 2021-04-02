@@ -33,24 +33,17 @@ struct Instruction{
     unsigned int relativeAddress;
     string symbolName;
     string instruction;
-    string arguments;
+    vector<string> arguments;
     unsigned int objectCode;
 };
 
 /**
- * This unordered map/Hash map Data Structure will hold all of the instructions
- * in the source program
+ * This vector holds all of the instructiosn in the order that the file is writte
+ * in
  * 
- * KEY:     realtive address in the program
- * 
- * Issues with relative address as the key:
- * - some instructions dont have an address
- * - some instructions do not increment the memory location (creates duplicates of memory)
- * Both of these issues break the map in a fundemental manner
- * 
- * VALUE:   each value is an instruction struct obj
+ * Each element 
  **/
-map<string,Instruction> instructions;
+vector<Instruction> listingFile;
 
 /**
  * This Unordered map Data Structure holds the Symbol name as the key
@@ -68,13 +61,13 @@ map<string,ESTABstruct> ESTAB;           // This map emulates a HashTable
  * stored in the main vector calle `lines` 
  **/
 vector<vector<string>> lines;
-//vector<vector<string>> lines = {};      // This 2D vector holds the instructions
 
 // std::regex re(","); NEED to change the char delim to a regex obj for multiple deliminators
 vector<string> split(const string str, char delim) {
     vector<string> result;
-    istringstream ss{str};
+    istringstream ss(str);
     string token;
+
     while (getline(ss, token, delim)) {
         if (!token.empty()) {
             result.push_back(token);
@@ -82,6 +75,7 @@ vector<string> split(const string str, char delim) {
     }
     return result;
 }
+
 
 int printInstructions(){
 	for(int i = 0; i < lines.size(); i++){
@@ -139,6 +133,40 @@ void writeObjectFile(){
 }
 
 /**
+ * How to address column two of the listing file
+ * 
+ * Create a cosntant time lookup hashtable to check if the second element in the 
+ * vector is a instruction 
+ * if its not then its either the prorgam name or a custom (programmer defined) symbol
+ * 
+ * this will allow us to set the correct field for the struct and store it in the vector
+ * 
+ **/
+void instructionParse(vector<string> instruct){
+    Instruction structData;
+    for(int i = 0; i < instruct.size(); i++){
+        //if first item in index = END directive, special case, else first item = rel address
+        string str = "END";
+        if(str.compare(instruct[0]) == 0){
+            generateEndRecord(instruct);
+        }
+        else{
+            stringstream relAddr(instruct[0]);
+            int x = 0;
+            relAddr >> x;
+            structData.relativeAddress = x;
+        }
+    }    
+}
+
+void generateHeaderRecord(vector<string> instruct){
+    
+}
+void generateEndRecord(vector<string> instruct){
+
+}
+
+/**
  * 
  * This function (readFile) will call two separate functions named:
  * - constructESTAB
@@ -180,12 +208,12 @@ void writeObjectFile(){
 int readFile(const char* input){
     ifstream file(input);
     string line;
+    vector<string> temp;
     if (file.is_open()) {
-        
         while (getline(file, line)) {
-            lines.push_back(split(line, ' '));
+            temp = split(line, ' ');
+            instructionParse(temp);
         }
-
     }
     file.close();
     return 0;
