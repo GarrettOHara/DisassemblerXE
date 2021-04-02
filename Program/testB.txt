@@ -1,6 +1,0 @@
-This file is testB
-... 69 computer thes
-
-0040  END  +LDA  RES    0FA298
-
-End of testB

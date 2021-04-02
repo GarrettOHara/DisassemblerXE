@@ -1,5 +1,0 @@
-This file is testC
-
-tesing this file
-
-end of testC
