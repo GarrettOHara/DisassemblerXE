@@ -67,7 +67,8 @@ map<string,ESTABstruct> ESTAB;           // This map emulates a HashTable
  * tokenized strings. Each vector is an instruction line. Each vector is 
  * stored in the main vector calle `lines` 
  **/
-vector<vector<string>> lines = {};      // This 2D vector holds the instructions
+vector<vector<string>> lines;
+//vector<vector<string>> lines = {};      // This 2D vector holds the instructions
 
 // std::regex re(","); NEED to change the char delim to a regex obj for multiple deliminators
 vector<string> split(const string str, char delim) {
@@ -83,14 +84,25 @@ vector<string> split(const string str, char delim) {
 }
 
 int printInstructions(){
-        for(const vector<string> i : lines){
-        for(const string j : i){
-            cout << j << endl;
-        }
-        cout<<"\n";
-    }
-    return 0;
+	for(int i = 0; i < lines.size(); i++){
+		vector<string> temp = lines[i];
+		for(int j = 0; j < temp.size(); j++){
+			cout << temp[i];
+		}
+		printf("\n");
+	}
+	return 0;
 }
+
+// int printInstructions(){
+//         for(const vector<string> i : lines){
+//         for(const string j : i){
+//             cout << j << endl;
+//         }
+//         cout<<"\n";
+//     }
+//     return 0;
+// }
 
 void populateESTAB(){
     /**
