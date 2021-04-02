@@ -2,7 +2,7 @@
  * This Program was written by:
  * 
  * Garrett O'Hara cssc3724 RedId: 822936303
- * Vivian  Reyes  cssc3713 RedId: 821862269
+ * Vivian Reyes  cssc3713 RedId: 821862269
  * 
  * CS 530 | Lenoard
  **/
