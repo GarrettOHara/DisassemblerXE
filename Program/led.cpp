@@ -76,13 +76,16 @@ vector<string> split(const string str, char delim) {
 }
 
 int printInstructions(){
+    printf("Source Code Instructions:\n");
+    printf("-------------------------\n\n");
 	for(int i = 0; i < lines.size(); i++){
 		vector<string> temp = lines[i];
 		for(int j = 0; j < temp.size(); j++){
-			cout << temp[i];
+			cout << temp[j] << ' ';
 		}
 		printf("\n");
 	}
+    printf("\n-------------------------\n\n");
 	return 0;
 }
 
@@ -202,7 +205,6 @@ int readFile(const char* input){
             temp = split(line, ' ');
             lines.push_back(temp);
             instructionParse(temp);
-            //parsing(line, temp) 
         }
     }
     file.close();
