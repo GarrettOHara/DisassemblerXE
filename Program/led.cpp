@@ -60,6 +60,7 @@ map<string,ESTABstruct> ESTAB;           // This map emulates a HashTable
  * stored in the main vector calle `lines` 
  **/
 vector<vector<string> > lines;
+vector<string> sourceCode;
 
 // std::regex re(","); NEED to change the char delim to a regex obj for multiple deliminators
 vector<string> split(const string str, char delim) {
@@ -76,8 +77,8 @@ vector<string> split(const string str, char delim) {
 }
 
 int printInstructions(){
-    printf("Source Code Instructions:\n");
-    printf("-------------------------\n\n");
+    printf("Instructions Deliminated:\n");
+    printf("-------------------------\n");
 	for(int i = 0; i < lines.size(); i++){
 		vector<string> temp = lines[i];
 		for(int j = 0; j < temp.size(); j++){
@@ -85,9 +86,19 @@ int printInstructions(){
 		}
 		printf("\n");
 	}
-    printf("\n-------------------------\n\n");
+    printf("-------------------------\n\n");
 	return 0;
 }
+ void printSourceCode(){
+    printf("Source Code:\n");
+    printf("-------------------------\n");
+	for(int i = 0; i < sourceCode.size(); i++){
+        cout << sourceCode[i];
+        printf("\n");
+	}
+    printf("-------------------------\n");
+	return;
+ }
 
 void generateHeaderRecord(vector<string> instruct){
     
@@ -204,6 +215,7 @@ int readFile(const char* input){
         while (getline(file, line)) {
             temp = split(line, ' ');
             lines.push_back(temp);
+            sourceCode.push_back(line);
             instructionParse(temp);
         }
     }
@@ -225,6 +237,7 @@ int main(int argc, char *argv[]){
         readFile(argv[i]);
     }
     printInstructions();
+    printSourceCode();
     return 0;
 }
 
@@ -233,20 +246,7 @@ int main(int argc, char *argv[]){
  * 
  * main method must be at bottom. Probably just when not in a class.
  * 
- * ELF/ in the output is the text file header, is holds entry addresses 
- * which is the first address in a .text region
- * use objdump-f to see the enty point
- * 
- * from: https://stackoverflow.com/questions/3102232/elf-file-format
- * 
- * Approach:
- * 
- * ESTAB
- * Create a ESTAB in the form of a map or hashtable data structure. 
- * on the first pass of the linker, parse each file and store the value in the 
- * map/hashtable along with the absoulte address
- *  - Absolute address can be calculated by the actual address of the program and 
- *    the relative address of the symbol
+ * ELF/ in the outpusourceCodeddress of the symbol
  * 
  * 
  * Helpful Resources: 
