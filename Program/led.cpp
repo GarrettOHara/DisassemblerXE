@@ -39,10 +39,8 @@ struct Instruction{
 };
 
 /**
- * This vector holds all of the instructiosn in the order that the file is writte
- * in
- * 
- * Each element 
+ * This vector holds all of the instructions in a source code file
+ * - Each element is an Instruction struct
  **/
 vector<Instruction> listingFile;
 
@@ -77,7 +75,6 @@ vector<string> split(const string str, char delim) {
     return result;
 }
 
-
 int printInstructions(){
 	for(int i = 0; i < lines.size(); i++){
 		vector<string> temp = lines[i];
@@ -95,16 +92,6 @@ void generateHeaderRecord(vector<string> instruct){
 void generateEndRecord(vector<string> instruct){
 
 }
-
-// int printInstructions(){
-//         for(const vector<string> i : lines){
-//         for(const string j : i){
-//             cout << j << endl;
-//         }
-//         cout<<"\n";
-//     }
-//     return 0;
-// }
 
 void populateESTAB(){
     /**
