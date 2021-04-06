@@ -6,6 +6,7 @@
  * 
  * CS 530 | Lenoard
  **/
+#include <stdio.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -88,6 +89,13 @@ int printInstructions(){
 	return 0;
 }
 
+void generateHeaderRecord(vector<string> instruct){
+    
+}
+void generateEndRecord(vector<string> instruct){
+
+}
+
 // int printInstructions(){
 //         for(const vector<string> i : lines){
 //         for(const string j : i){
@@ -157,13 +165,6 @@ void instructionParse(vector<string> instruct){
             structData.relativeAddress = x;
         }
     }    
-}
-
-void generateHeaderRecord(vector<string> instruct){
-    
-}
-void generateEndRecord(vector<string> instruct){
-
 }
 
 /**
