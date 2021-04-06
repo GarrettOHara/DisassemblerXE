@@ -59,7 +59,7 @@ map<string,ESTABstruct> ESTAB;           // This map emulates a HashTable
  * tokenized strings. Each vector is an instruction line. Each vector is 
  * stored in the main vector calle `lines` 
  **/
-vector<vector<string>> lines;
+vector<vector<string> > lines;
 
 // std::regex re(","); NEED to change the char delim to a regex obj for multiple deliminators
 vector<string> split(const string str, char delim) {
@@ -200,7 +200,9 @@ int readFile(const char* input){
     if (file.is_open()) {
         while (getline(file, line)) {
             temp = split(line, ' ');
+            lines.push_back(temp);
             instructionParse(temp);
+            //parsing(line, temp) 
         }
     }
     file.close();
