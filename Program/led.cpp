@@ -8,6 +8,7 @@
  **/
 #include <stdio.h>
 #include <string>
+#include <iomanip>
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -117,14 +118,32 @@ void printESTAB(){
      * Call a check proper address function before
      * this to throw an error
      **/
-    printf("\nESTAB:------------------------\n");
+    printf("\nESTAB:\n------------------------\n");
     map<string, ESTABdata>::iterator it;
     for(it = ESTAB.begin(); it != ESTAB.end(); it++){
-        cout << it->first
-             << ':'
-             //<< it->second
-             << endl;
+        if(it->first == "")
+            continue;
+        else if (it->second.instruction == ""){
+            cout << it->first
+                 << setw(10)
+                 << setfill(' ')
+                 << setw(5)
+                 << setfill('0')
+                 << " "
+                 << it->second.address
+                 << setw(3)
+                 << it->second.length
+                 << endl;
+        }
+        else if(it->second.length == 0){
+            cout << setw(10)
+                 << it->first
+                 << setw(5)
+                 << it->second.instruction
+                 << endl;
+        }
     }
+    printf("\n------------------------\n\n");
     return;
 }
 
@@ -138,7 +157,8 @@ void generateESTAB(vector<string> vec, string instruction){
      * actual address is updated in the ESTAB
      **/
     ESTABdata data;
-    if(vec[0] == ".")
+    cout << "Contents of vect:" << vec[0] << endl;
+    if(vec.size() == 0 || vec[0] == ".")
         return;
     if(vec[2] == "START"){
         programName = vec[1];
@@ -160,6 +180,15 @@ void generateESTAB(vector<string> vec, string instruction){
         data.address = atoi(vec[0].c_str());
         data.instruction = arg;
         ESTAB[arg] = data;
+    }
+    if(vec[2] == "=C'EOF'"){
+        unsigned int val = ESTAB[programName].length;
+        unsigned int length = 29;//atoi(vec[2].c_str());
+        cout << "\n\n" << setfill('0')
+             << val
+             << setw(3)
+             << length << endl;
+        ESTAB[programName].length = length - val;
     }
     
     return;
@@ -263,10 +292,10 @@ int readFile(const char* input){
             lines.push_back(temp);
             sourceCode.push_back(line);
             instructionParse(temp);
-//            generateESTAB(temp,line);
+            generateESTAB(temp,line);
         }
     }
-//    printESTAB();
+    printESTAB();
     file.close();
     return 0;
 }
