@@ -7,6 +7,8 @@
  * CS 530 | Lenoard
  **/
 #include <stdio.h>
+#include <string>
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -16,13 +18,14 @@
 
 using namespace std;
 
-
+string programName;
 /**
  * Non initialized values could run into a runtime error
  * because there is no constructor
  **/
-struct ESTABstruct{
+struct ESTABdata{
     string controlSection;
+    string instruction;
     unsigned int address;
     unsigned int length;    
 };
@@ -52,7 +55,7 @@ vector<Instruction> listingFile;
  * 
  * Store a STRUCT as a value
  **/
-map<string,ESTABstruct> ESTAB;           // This map emulates a HashTable
+map<string,ESTABdata> ESTAB;           // This map emulates a HashTable
 
 /**
  * This 2D data structure is used store all of the instructions as
@@ -107,7 +110,25 @@ void generateEndRecord(vector<string> instruct){
 
 }
 
-void populateESTAB(){
+void printESTAB(){
+    /**
+     * Order contents in map by address
+     * Write to file
+     * Call a check proper address function before
+     * this to throw an error
+     **/
+    printf("\nESTAB:------------------------\n");
+    map<string, ESTABdata>::iterator it;
+    for(it = ESTAB.begin(); it != ESTAB.end(); it++){
+        cout << it->first
+             << ':'
+             //<< it->second
+             << endl;
+    }
+    return;
+}
+
+void generateESTAB(vector<string> vec, string instruction){
     /**
      * This function needs to parse the lines vector for
      * EXTDEF and EXTREF then adds all the symbols defined here
@@ -116,6 +137,31 @@ void populateESTAB(){
      * When the symbol is parsed in the first pass of the linker, the 
      * actual address is updated in the ESTAB
      **/
+    ESTABdata data;
+    if(vec[0] == ".")
+        return;
+    if(vec[2] == "START"){
+        programName = vec[1];
+        data.controlSection = programName;
+        data.address = atoi(vec[0].c_str());
+        data.length = atoi(vec[2].c_str());
+        ESTAB[programName] = data;
+    }
+    if(vec[2] == "EXTDEF" || vec[2] == "EXTREF"){
+        string arg = vec[1];
+        data.controlSection = programName;
+        data.address = atoi(vec[0].c_str());
+        data.instruction = arg;
+        ESTAB[arg] = data;
+    }
+    if(vec[2] == "WORD" || vec[2] == "RESW"){
+        string arg = vec[1];
+        data.controlSection = programName;
+        data.address = atoi(vec[0].c_str());
+        data.instruction = arg;
+        ESTAB[arg] = data;
+    }
+    
     return;
 }
 
@@ -217,8 +263,10 @@ int readFile(const char* input){
             lines.push_back(temp);
             sourceCode.push_back(line);
             instructionParse(temp);
+//            generateESTAB(temp,line);
         }
     }
+//    printESTAB();
     file.close();
     return 0;
 }
