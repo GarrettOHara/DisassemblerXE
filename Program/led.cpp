@@ -34,13 +34,49 @@ struct ESTABdata{
 /**
  * This Struct holds the data associated with each instruction
  **/
-struct Instruction{
+struct ObjectFileLine{
+    HeaderRecord header;
+    DefinitionRecord definition;
+    ReferenceRecord reference;
+    TextRecord text;
+    ModificationRecord modification;
+    EndRecord end;
+
     unsigned int relativeAddress;
     string symbolName;
     string instruction;
     vector<string> arguments;
     unsigned int objectCode;
+
+
+    //Fields For header record
+    string controlSectionName;
+    unsinged int actualAddress;
+    unsided int length;
+
+    //Text Record fields
+    
 };
+
+struct HeaderRecord{
+
+};
+struct DefinitionRecord{
+
+};
+struct ReferenceRecord{
+
+};
+struct TextRecord{
+
+};
+struct ModificationRecord{
+
+};
+struct EndRecord{
+
+};
+ 
 
 /**
  * This vector holds all of the instructions in a source code file
