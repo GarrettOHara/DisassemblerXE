@@ -16,7 +16,6 @@
 
 using namespace std;
 
-
 /**
  * Non initialized values could run into a runtime error
  * because there is no constructor
@@ -34,7 +33,8 @@ struct Instruction{
     unsigned int relativeAddress;
     string symbolName;
     string instruction;
-    vector<string> arguments;
+    //vector<string> arguments;
+    string arguments;
     unsigned int objectCode;
 };
 
@@ -100,6 +100,30 @@ int printInstructions(){
 	return;
  }
 
+/*
+    Idea on indetifying what is in each column
+    - we already have every string in a 2D vector, but not all the indexes and types match up
+    - so we are going to compare each line at certain indexes and determine if there is a space or a char 
+    - and depending on that we should know what goes where into the struct values, probs with a lot of if statments unfortantely
+    - index 8 = labels, index 16/17 = instruction, index 25/26 = arguments, index 51 = address
+*/
+ void printIndexes(){
+     printf("Testing Indexes\n");
+     printf("-------------------------\n");
+     std::string line;
+     for(int i = 3; i < 5; i++){
+        std::string line (sourceCode[i]);
+        cout << "Char at index 8, labels: " << line.at(8) << endl;
+        cout << "Char at index 16, instructions: "<< line.at(16) << endl;
+        cout << "Char at index 17, instructions: " << line.at(17) << endl;
+        cout << "Char at index 25, arguments: " << line.at(25) << endl;
+        cout << "Char at index 26, arguments: " << line.at(26) << endl;
+        cout << "Char at index 51, object code: " << line.at(51) << endl;
+	}
+    printf("-------------------------\n");
+    return;
+ }
+
 void generateHeaderRecord(vector<string> instruct){
     
 }
@@ -149,15 +173,26 @@ void writeObjectFile(){
  * if its not then its either the prorgam name or a custom (programmer defined) symbol
  * 
  * this will allow us to set the correct field for the struct and store it in the vector
- * 
+ * Note 4/8: not making multiple instances of this struct, creating one and overriding it each time,
+ * wherever you initialize you can also use it in the scope of the function, 
+ * but I wonder if we can still access it if we pass the struct to other functions, maybe have the function return a struct?
+ * Note 4/9: make new function for header record (needs starting address and length of program)
+ * //2D vector to compare
  **/
-void instructionParse(vector<string> instruct){
-    Instruction structData;
-    for(int i = 0; i < instruct.size(); i++){
+Instruction instructionParse(vector<string> instruct, string line){
+    struct Instruction structData; //objectfileline
+
+    //call header, definiton, ref record here
+
+    //note: line 9 in listing file is a special case
+    //line 4 is where program starts, estab take getting taken care of separately
+    //do avoid hard coding int 4, find where First starts
+    for(int i = 4; i < instruct.size(); i++){
         //if first item in index = END directive, special case, else first item = rel address
         string str = "END";
         if(str.compare(instruct[0]) == 0){
             generateEndRecord(instruct);
+            break;
         }
         else{
             stringstream relAddr(instruct[0]);
@@ -165,7 +200,31 @@ void instructionParse(vector<string> instruct){
             relAddr >> x;
             structData.relativeAddress = x;
         }
-    }    
+        //if line has a symbol name then index 1 = symnbol name and index 2 = instruction
+        if(!(line.at(8) == ' '))
+            structData.symbolName = instruct[1];
+            structData.instruction = instruct[2];
+            structData.arguments = instruct[3];
+            //not always the case for this need to check bounds
+            if(instruct.size() > 3){
+                stringstream temp(instruct[4]);
+                unsigned int x = 0;
+                temp >> x;
+                structData.objectCode = x;
+            }
+        else
+            structData.instruction = instruct[1]; //if no second column instruction is at index 1 of instruct vector
+            structData.arguments = instruct[2]; 
+            //check for bounds
+            if(instruct.size() > 3){
+                stringstream temp(instruct[3]);
+                unsigned int x = 0;
+                temp >> x;
+                structData.objectCode = x;
+            }
+                
+    }
+    return structData;    
 }
 
 /**
@@ -206,8 +265,13 @@ void instructionParse(vector<string> instruct){
  *      we will probably just throw all of the labels in the EXTDEF and EXTREF 
  *      lines in the ESTAB, then update the addresses with the actual
  *      addy of the program and the realtive address of he symbol in the program
+ * 
+ *      
  **/
 int readFile(const char* input){
+    map<string,Instruction> instructionMap;  
+    //make vector instead of map that holds instruction struct objects
+    struct Instruction tempStruct;
     ifstream file(input);
     string line;
     vector<string> temp;
@@ -216,9 +280,12 @@ int readFile(const char* input){
             temp = split(line, ' ');
             lines.push_back(temp);
             sourceCode.push_back(line);
-            instructionParse(temp);
+            tempStruct = instructionParse(temp, line);
+            instructionMap.insert("TEST", tempStruct);
         }
     }
+    cout << "test: rel address: " tempStruct.relativeAddress << endl;
+
     file.close();
     return 0;
 }
@@ -238,6 +305,7 @@ int main(int argc, char *argv[]){
     }
     printInstructions();
     printSourceCode();
+    printIndexes();
     return 0;
 }
 
@@ -281,6 +349,4 @@ int main(int argc, char *argv[]){
  *  - Garret idea: working on split function that will split ever line into strings and each 
  * line will be stored in a vector of vectors 
  *  - let's start brainstorming what exactly the object file needs
- * 
- * 
  **/
