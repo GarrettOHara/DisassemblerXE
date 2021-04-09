@@ -17,4 +17,3 @@
 0026    LEN      WORD     X'02C
                  END
 0029    *       =C'EOF'                            454F46
-

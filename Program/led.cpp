@@ -7,6 +7,9 @@
  * CS 530 | Lenoard
  **/
 #include <stdio.h>
+#include <string>
+#include <iomanip>
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -16,12 +19,14 @@
 
 using namespace std;
 
+string programName;
 /**
  * Non initialized values could run into a runtime error
  * because there is no constructor
  **/
-struct ESTABstruct{
+struct ESTABdata{
     string controlSection;
+    string instruction;
     unsigned int address;
     unsigned int length;    
 };
@@ -29,14 +34,50 @@ struct ESTABstruct{
 /**
  * This Struct holds the data associated with each instruction
  **/
-struct Instruction{
+struct ObjectFileLine{
+    HeaderRecord header;
+    DefinitionRecord definition;
+    ReferenceRecord reference;
+    TextRecord text;
+    ModificationRecord modification;
+    EndRecord end;
+
     unsigned int relativeAddress;
     string symbolName;
     string instruction;
     //vector<string> arguments;
     string arguments;
     unsigned int objectCode;
+
+
+    //Fields For header record
+    string controlSectionName;
+    unsinged int actualAddress;
+    unsided int length;
+
+    //Text Record fields
+    
 };
+
+struct HeaderRecord{
+
+};
+struct DefinitionRecord{
+
+};
+struct ReferenceRecord{
+
+};
+struct TextRecord{
+
+};
+struct ModificationRecord{
+
+};
+struct EndRecord{
+
+};
+ 
 
 /**
  * This vector holds all of the instructions in a source code file
@@ -52,7 +93,7 @@ vector<Instruction> listingFile;
  * 
  * Store a STRUCT as a value
  **/
-map<string,ESTABstruct> ESTAB;           // This map emulates a HashTable
+map<string,ESTABdata> ESTAB;           // This map emulates a HashTable
 
 /**
  * This 2D data structure is used store all of the instructions as
@@ -131,7 +172,43 @@ void generateEndRecord(vector<string> instruct){
 
 }
 
-void populateESTAB(){
+void printESTAB(){
+    /**
+     * Order contents in map by address
+     * Write to file
+     * Call a check proper address function before
+     * this to throw an error
+     **/
+    printf("\nESTAB:\n------------------------\n");
+    map<string, ESTABdata>::iterator it;
+    for(it = ESTAB.begin(); it != ESTAB.end(); it++){
+        if(it->first == "")
+            continue;
+        else if (it->second.instruction == ""){
+            cout << it->first
+                 << setw(10)
+                 << setfill(' ')
+                 << setw(5)
+                 << setfill('0')
+                 << " "
+                 << it->second.address
+                 << setw(3)
+                 << it->second.length
+                 << endl;
+        }
+        else if(it->second.length == 0){
+            cout << setw(10)
+                 << it->first
+                 << setw(5)
+                 << it->second.instruction
+                 << endl;
+        }
+    }
+    printf("\n------------------------\n\n");
+    return;
+}
+
+void generateESTAB(vector<string> vec, string instruction){
     /**
      * This function needs to parse the lines vector for
      * EXTDEF and EXTREF then adds all the symbols defined here
@@ -140,6 +217,41 @@ void populateESTAB(){
      * When the symbol is parsed in the first pass of the linker, the 
      * actual address is updated in the ESTAB
      **/
+    ESTABdata data;
+    cout << "Contents of vect:" << vec[0] << endl;
+    if(vec.size() == 0 || vec[0] == ".")
+        return;
+    if(vec[2] == "START"){
+        programName = vec[1];
+        data.controlSection = programName;
+        data.address = atoi(vec[0].c_str());
+        data.length = atoi(vec[2].c_str());
+        ESTAB[programName] = data;
+    }
+    if(vec[2] == "EXTDEF" || vec[2] == "EXTREF"){
+        string arg = vec[1];
+        data.controlSection = programName;
+        data.address = atoi(vec[0].c_str());
+        data.instruction = arg;
+        ESTAB[arg] = data;
+    }
+    if(vec[2] == "WORD" || vec[2] == "RESW"){
+        string arg = vec[1];
+        data.controlSection = programName;
+        data.address = atoi(vec[0].c_str());
+        data.instruction = arg;
+        ESTAB[arg] = data;
+    }
+    if(vec[2] == "=C'EOF'"){
+        unsigned int val = ESTAB[programName].length;
+        unsigned int length = 29;//atoi(vec[2].c_str());
+        cout << "\n\n" << setfill('0')
+             << val
+             << setw(3)
+             << length << endl;
+        ESTAB[programName].length = length - val;
+    }
+    
     return;
 }
 
@@ -280,12 +392,11 @@ int readFile(const char* input){
             temp = split(line, ' ');
             lines.push_back(temp);
             sourceCode.push_back(line);
-            tempStruct = instructionParse(temp, line);
-            instructionMap.insert("TEST", tempStruct);
+            instructionParse(temp);
+            generateESTAB(temp,line);
         }
     }
-    cout << "test: rel address: " tempStruct.relativeAddress << endl;
-
+    printESTAB();
     file.close();
     return 0;
 }
