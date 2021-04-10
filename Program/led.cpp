@@ -255,6 +255,60 @@ void generateESTAB(vector<string> vec, string instruction){
     return;
 }
 
+//we generate one line of the text record
+//should return new index
+//created 3/10 by viv
+int generatedTextRecord(int index, vector<string> sourceCode, vector<vector<string>> tokenized){
+
+        //will need some sort of counter to make sure we are not going over size IE
+        int counter;
+
+        //store rel address
+        stringstream relAddr(instruct[0]);
+        int x = 0;
+        relAddr >> x;
+        structData.relativeAddress = x;
+
+        //what will our loop condition be?
+        while(//counter < IE (hex))
+        {
+            //if line has a symbol name then index 1 = symnbol name and index 2 = instruction
+            //
+            string line;
+            line = sourceCode[index];
+            if(!(line.at(8) == ' '))
+            {
+                structData.symbolName = tokenized[index][1];
+                structData.instruction = tokenized[index][2];
+                structData.arguments = tokenized[index][3];
+                //not always the case for this need to check bounds
+                if(instruct.size() > 3){
+                    stringstream temp(tokenized[index][4]);
+                    unsigned int x = 0;
+                    temp >> x;
+                    structData.objectCode = x;
+                }
+            }
+                
+            else{
+                structData.instruction = tokenized[index][1]; //if no second column instruction is at index 1 of instruct vector
+                structData.arguments = tokenized[index][2]; 
+                //check for bounds
+                if(instruct.size() > 3){
+                    stringstream temp(tokenized[index][3]);
+                    unsigned int x = 0;
+                    temp >> x;
+                    structData.objectCode = x;
+                }
+            }
+            //also need to be filling the TextRecord struct of every loop
+            //increment index 
+            index++;
+        }
+        return index;   
+    }
+}
+
 //Notes: need to figure when we start a new text record (max size or format 4?)
 /**
  * Header Record: H, string of program name, starting address, length of program
@@ -291,51 +345,22 @@ void writeObjectFile(){
  * Note 4/9: make new function for header record (needs starting address and length of program)
  * //2D vector to compare
  **/
-Instruction instructionParse(vector<string> instruct, string line){
+Instruction instructionParse(vector<string> sourceCode, vector<vector<string>> tokenized){
     struct Instruction structData; //objectfileline
 
     //call header, definiton, ref record here
 
-    //note: line 9 in listing file is a special case
     //line 4 is where program starts, estab take getting taken care of separately
     //do avoid hard coding int 4, find where First starts
-    for(int i = 4; i < instruct.size(); i++){
+    //3/10: this will need to be a nested for loop?
+    for(int i = 4; i < sourceCode.size(); i++){
         //if first item in index = END directive, special case, else first item = rel address
         string str = "END";
         if(str.compare(instruct[0]) == 0){
             generateEndRecord(instruct);
             break;
         }
-        else{
-            stringstream relAddr(instruct[0]);
-            int x = 0;
-            relAddr >> x;
-            structData.relativeAddress = x;
-        }
-        //if line has a symbol name then index 1 = symnbol name and index 2 = instruction
-        if(!(line.at(8) == ' '))
-            structData.symbolName = instruct[1];
-            structData.instruction = instruct[2];
-            structData.arguments = instruct[3];
-            //not always the case for this need to check bounds
-            if(instruct.size() > 3){
-                stringstream temp(instruct[4]);
-                unsigned int x = 0;
-                temp >> x;
-                structData.objectCode = x;
-            }
-        else
-            structData.instruction = instruct[1]; //if no second column instruction is at index 1 of instruct vector
-            structData.arguments = instruct[2]; 
-            //check for bounds
-            if(instruct.size() > 3){
-                stringstream temp(instruct[3]);
-                unsigned int x = 0;
-                temp >> x;
-                structData.objectCode = x;
-            }
-                
-    }
+        //generateTextRecord(index, sourceCode, tokenized )
     return structData;    
 }
 
