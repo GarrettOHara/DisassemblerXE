@@ -25,3 +25,31 @@ int testPrint(const char* input){
     std::cout << "\n";
     return 0;
 }
+
+
+
+
+SORTING ESTAB
+
+
+void sortESTABA(){
+    vector<pair<int,int> > pairs;
+    map<string, ESTABdata>::iterator it;
+    for(it = ESTAB.begin(); it != ESTAB.end(); it++){
+        pairs.push_back(*it);
+    }
+    sort(pairs.begin(), pairs.end(), [=](std::pair<int, int>& a, std::pair<int, int>& b)
+    {
+        return a.second < b.second;
+    }
+    return; 
+}
+multimap<ESTABdata, string> sortESTAB(map<string,ESTABdata> & src) {
+
+    multimap<ESTABdata,string> dst;
+
+    for(typename map<A, ESTABdata>::const_iterator it = src.begin(); it != src.end(); ++it)
+        dst.insert(pair<ESTABdata, string>(it -> second, it -> first));
+
+    return dst;
+}

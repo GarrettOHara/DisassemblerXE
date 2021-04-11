@@ -172,8 +172,7 @@ void printESTAB(){
             continue;
         else if (it->second.instruction == ""){
             cout << it->first
-                 << setw(10)
-                 << setfill(' ')
+                 << "       "
                  << setw(5)
                  << setfill('0')
                  << " "
@@ -182,11 +181,15 @@ void printESTAB(){
                  << it->second.length
                  << endl;
         }
-        else if(it->second.length == 0){
-            cout << setw(10)
+        else if(it->second.instruction != ""){
+            cout << " "
+                 << setw(10)
+                 << setfill(' ')
                  << it->first
-                 << setw(5)
-                 << it->second.instruction
+                 << " "
+                 << setw(4)
+                 << setfill('0')
+                 << it->second.address
                  << endl;
         }
     }
@@ -204,7 +207,11 @@ void generateESTAB(vector<string> vec, string instruction){
      * actual address is updated in the ESTAB
      **/
     ESTABdata data;
-    cout << "Contents of vect:" << vec[0] << endl;
+    if(vec.size() < 3){
+        cout << "Contents of vect:" << vec[0] << endl;
+    } else {
+        cout << "Contents of vect:" << vec[2] << endl;
+    }
     if(vec.size() == 0 || vec[0] == ".")
         return;
     if(vec[2] == "START"){
@@ -230,16 +237,15 @@ void generateESTAB(vector<string> vec, string instruction){
     }
     if(vec[2] == "=C'EOF'"){
         unsigned int val = ESTAB[programName].length;
-        unsigned int length = 29;//atoi(vec[2].c_str());
-        cout << "\n\n" << setfill('0')
-             << val
-             << setw(3)
-             << length << endl;
+        unsigned int length = atoi(vec[0].c_str());
+       
         ESTAB[programName].length = length - val;
     }
     
     return;
 }
+
+
 
 void generateHeaderRecord(vector<string> sourceCode, vector<vector<string> > tokenized){
     
@@ -348,8 +354,6 @@ ObjectFileLine instructionParse(vector<string> sourceCode, vector<vector<string>
     return structData;    
 }
 
-
-
 int readFileESTAB(const char* input){
     ifstream file(input);
     string line;
@@ -360,6 +364,7 @@ int readFileESTAB(const char* input){
             lines.push_back(temp);
             testSourceCode.push_back(line);
             generateESTAB(temp,line);
+            //ESTAB = sortESTAB(ESTAB);
         }
     }
     printESTAB();
@@ -402,7 +407,7 @@ int main(int argc, char *argv[]){
 
     for(int i = 1; i < argc; i++){
         readFileESTAB(argv[i]);
-        readFileObjectFile(argv[i]);
+        //readFileObjectFile(argv[i]);
     }
     printInstructions();
     printSourceCode();
