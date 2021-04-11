@@ -4,7 +4,7 @@
  * Garrett O'Hara cssc3724 RedId: 822936303
  * Vivian Reyes  cssc3713 RedId: 821862269
  * 
- * CS 530 | Lenoard
+ * CS 530 | Professor Lenoard | March 2021
  **/
 #include <stdio.h>
 #include <string>
@@ -32,68 +32,58 @@ struct ESTABdata{
 };
 
 /**
- * This Struct holds the data associated with each instruction
+ * Object File Line is the Parent Struct of all of the 
+ * differnt types of object file liens there can be
+ * 
+ * each object record posesses different attributes and needs
+ * its own struct
  **/
 struct ObjectFileLine{
-    HeaderRecord header;
-    DefinitionRecord definition;
-    ReferenceRecord reference;
-    TextRecord text;
-    ModificationRecord modification;
-    EndRecord end;
+    struct HeaderRecord{
+        string controlSectionName;
+        unsigned int actualAddress;
+        unsigned int length;
+    };
+    struct DefinitionRecord{
 
-    unsigned int relativeAddress;
-    string symbolName;
-    string instruction;
-    //vector<string> arguments;
-    string arguments;
-    unsigned int objectCode;
+    };
+    struct ReferenceRecord{
 
+    };
+    struct TextRecord{
+        unsigned int relativeAddress;
+        string symbolName;
+        string instruction;
+        vector<string> arguments;
+        vector<unsigned int> objectCodes;
+    };
+    struct ModificationRecord{
 
-    //Fields For header record
-    string controlSectionName;
-    unsinged int actualAddress;
-    unsided int length;
+    };
+    struct EndRecord{
 
-    //Text Record fields
-    
+    };
+    struct HeaderRecord header;
+    struct DefinitionRecord definition;
+    struct ReferenceRecord reference;
+    struct TextRecord text;
+    struct ModificationRecord modification;
+    struct EndRecord end;
+
+    unsigned int relativeAddress;   
 };
-
-struct HeaderRecord{
-
-};
-struct DefinitionRecord{
-
-};
-struct ReferenceRecord{
-
-};
-struct TextRecord{
-
-};
-struct ModificationRecord{
-
-};
-struct EndRecord{
-
-};
- 
 
 /**
  * This vector holds all of the instructions in a source code file
  * - Each element is an Instruction struct
  **/
-vector<Instruction> listingFile;
+vector<ObjectFileLine> listingFile;
 
 /**
  * This Unordered map Data Structure holds the Symbol name as the key
  * and the address as the value
- * 
- * ISSUE: The integer needs be be expressed as a HEX value
- * 
- * Store a STRUCT as a value
  **/
-map<string,ESTABdata> ESTAB;           // This map emulates a HashTable
+map<string,ESTABdata> ESTAB;
 
 /**
  * This 2D data structure is used store all of the instructions as
@@ -101,7 +91,10 @@ map<string,ESTABdata> ESTAB;           // This map emulates a HashTable
  * stored in the main vector calle `lines` 
  **/
 vector<vector<string> > lines;
-vector<string> sourceCode;
+/**
+ * This vector stores all of the lines of the source code as strings
+ **/
+vector<string> testSourceCode;
 
 // std::regex re(","); NEED to change the char delim to a regex obj for multiple deliminators
 vector<string> split(const string str, char delim) {
@@ -133,8 +126,8 @@ int printInstructions(){
  void printSourceCode(){
     printf("Source Code:\n");
     printf("-------------------------\n");
-	for(int i = 0; i < sourceCode.size(); i++){
-        cout << sourceCode[i];
+	for(int i = 0; i < testSourceCode.size(); i++){
+        cout << testSourceCode[i];
         printf("\n");
 	}
     printf("-------------------------\n");
@@ -148,12 +141,12 @@ int printInstructions(){
     - and depending on that we should know what goes where into the struct values, probs with a lot of if statments unfortantely
     - index 8 = labels, index 16/17 = instruction, index 25/26 = arguments, index 51 = address
 */
- void printIndexes(){
+ void printIndexes(vector<string> sourceCode){
      printf("Testing Indexes\n");
      printf("-------------------------\n");
-     std::string line;
+     string line;
      for(int i = 3; i < 5; i++){
-        std::string line (sourceCode[i]);
+        string line (sourceCode[i].c_str());
         cout << "Char at index 8, labels: " << line.at(8) << endl;
         cout << "Char at index 16, instructions: "<< line.at(16) << endl;
         cout << "Char at index 17, instructions: " << line.at(17) << endl;
@@ -164,13 +157,6 @@ int printInstructions(){
     printf("-------------------------\n");
     return;
  }
-
-void generateHeaderRecord(vector<string> instruct){
-    
-}
-void generateEndRecord(vector<string> instruct){
-
-}
 
 void printESTAB(){
     /**
@@ -255,80 +241,72 @@ void generateESTAB(vector<string> vec, string instruction){
     return;
 }
 
+void generateHeaderRecord(vector<string> sourceCode, vector<vector<string> > tokenized){
+    
+}
+
+void generateDefinitionRecord(vector<string> sourceCode, vector<vector<string> > tokenized){
+    
+}
+
 //we generate one line of the text record
 //should return new index
 //created 3/10 by viv
-int generatedTextRecord(int index, vector<string> sourceCode, vector<vector<string>> tokenized){
+int generateTextRecord(int index, vector<string> sourceCode, vector<vector<string> > tokenized){
+    ObjectFileLine data;
+    //will need some sort of counter to make sure we are not going over size IE
+    int counter;
 
-        //will need some sort of counter to make sure we are not going over size IE
-        int counter;
+    //store rel address
+    unsigned int relAddress = atoi((tokenized.at(index).at(0).c_str()));
+    data.text.relativeAddress = relAddress;
 
-        //store rel address
-        stringstream relAddr(instruct[0]);
-        int x = 0;
-        relAddr >> x;
-        structData.relativeAddress = x;
-
-        //what will our loop condition be?
-        while(//counter < IE (hex))
+    //what will our loop condition be?
+    //counter < IE (hex))
+    while(true)
+    {
+        vector<string> instruct = tokenized.at(index);
+        //if line has a symbol name then index 1 = symnbol name and index 2 = instruction
+        //
+        string line = sourceCode[index];
+        if(line.at(8) != ' ')
         {
-            //if line has a symbol name then index 1 = symnbol name and index 2 = instruction
-            //
-            string line;
-            line = sourceCode[index];
-            if(!(line.at(8) == ' '))
-            {
-                structData.symbolName = tokenized[index][1];
-                structData.instruction = tokenized[index][2];
-                structData.arguments = tokenized[index][3];
-                //not always the case for this need to check bounds
-                if(instruct.size() > 3){
-                    stringstream temp(tokenized[index][4]);
-                    unsigned int x = 0;
-                    temp >> x;
-                    structData.objectCode = x;
-                }
+            data.text.symbolName = tokenized[index][1];
+            data.text.instruction = tokenized[index][2];
+            data.text.arguments.push_back(tokenized[index][3]);
+            //not always the case for this need to check bounds
+            if(instruct.size() > 3){
+                stringstream temp(tokenized[index][4]);
+                unsigned int x = 0;
+                temp >> x;
+                data.text.objectCodes.push_back(x);
             }
-                
-            else{
-                structData.instruction = tokenized[index][1]; //if no second column instruction is at index 1 of instruct vector
-                structData.arguments = tokenized[index][2]; 
-                //check for bounds
-                if(instruct.size() > 3){
-                    stringstream temp(tokenized[index][3]);
-                    unsigned int x = 0;
-                    temp >> x;
-                    structData.objectCode = x;
-                }
-            }
-            //also need to be filling the TextRecord struct of every loop
-            //increment index 
-            index++;
         }
-        return index;   
+            
+        else{
+            data.text.instruction = tokenized[index][1]; //if no second column instruction is at index 1 of instruct vector
+            data.text.arguments.push_back(tokenized[index][2]);
+            //check for bounds
+            if(instruct.size() > 3){
+                stringstream temp(tokenized[index][3]);
+                unsigned int x = 0;
+                temp >> x;
+                data.text.objectCodes.push_back(x);
+            }
+        }
+        //also need to be filling the TextRecord struct of every loop
+        //increment index 
+        index++;
     }
+    return index;   
 }
 
-//Notes: need to figure when we start a new text record (max size or format 4?)
-/**
- * Header Record: H, string of program name, starting address, length of program
- * Text Record: T, starting address of text record, length of text record line, object codes
- * Modification Record: M, relocation address, length, flag, segment name
- * End Record: E, starting address (only first control section/main program has end record)
- */
-void writeObjectFile(){
-    /**
-     * How to do this? each record type could be a new funciton
-     * 
-     * Create Head record
-     * 
-     * Create Text record
-     * 
-     * Create Mod record
-     * 
-     * Create End record
-     **/
-    return;
+void generateModificationRecord(vector<string> sourceCode, vector<vector<string> > tokenized){
+
+}
+
+void generateEndRecord(vector<string> sourceCode, vector<vector<string> > tokenized){
+
 }
 
 /**
@@ -345,8 +323,8 @@ void writeObjectFile(){
  * Note 4/9: make new function for header record (needs starting address and length of program)
  * //2D vector to compare
  **/
-Instruction instructionParse(vector<string> sourceCode, vector<vector<string>> tokenized){
-    struct Instruction structData; //objectfileline
+ObjectFileLine instructionParse(vector<string> sourceCode, vector<vector<string> > tokenized){
+    struct ObjectFileLine structData;
 
     //call header, definiton, ref record here
 
@@ -355,60 +333,24 @@ Instruction instructionParse(vector<string> sourceCode, vector<vector<string>> t
     //3/10: this will need to be a nested for loop?
     for(int i = 4; i < sourceCode.size(); i++){
         //if first item in index = END directive, special case, else first item = rel address
-        string str = "END";
-        if(str.compare(instruct[0]) == 0){
-            generateEndRecord(instruct);
+        // string str = "END";
+        // if(str.compare(tokenized.at(i).at(0) == 0)){
+        //     generateEndRecord(sourceCode, tokenized);
+        //     break;
+        // }
+        if(tokenized.at(i).at(0) == "END"){
+            generateEndRecord(sourceCode, tokenized);
             break;
         }
-        //generateTextRecord(index, sourceCode, tokenized )
+        //generateTextRecord(index, sourceCode, tokenized);
+    }
+        
     return structData;    
 }
 
-/**
- * 
- * This function (readFile) will call two separate functions named:
- * - constructESTAB
- * - constructObjectFile
- * 
- * These two functions will do exaclty what you think
- * 
- * Data Structures for the ESTAB: HashTable
- *  - In c++ the easiest/standard lib way of implemnation 
- * is through an "unordered map"
- * Documentation:  http://www.cplusplus.com/reference/unordered_map/unordered_map/
- * 
- * 
- * New Idea: (This was acheived with the 2D array/vector: lines)
- * 
- * Since the ReferenceTable is really not practicle and seems dumb
- * We can split each line by a space delininator
- * This way we will have all the information broke into separtate
- * string literals and store them in a list/vector/array of some type
- * 
- * given this sanitized line, we now have valuable information about it like:
- * - how long is the array
- *      This will tell us how many instructions/items are in the line perhaps
- *      understand what kind of instruction it is
- *      EX:
- *          - An array with two we know this is like
- *          00440   END
- * 
- * - We can parse the list for a certain instruction like WORD or RESW
- *      This will tell us if this line declares a Symbol or not
- *      If so, we can store the index of the array of like 1 (0 formatted)
- *      as the key in the ESTAB, or update the address value in the ESTAB
- *      with the local/relative address in the program 
- * 
- *      we will probably just throw all of the labels in the EXTDEF and EXTREF 
- *      lines in the ESTAB, then update the addresses with the actual
- *      addy of the program and the realtive address of he symbol in the program
- * 
- *      
- **/
-int readFile(const char* input){
-    map<string,Instruction> instructionMap;  
-    //make vector instead of map that holds instruction struct objects
-    struct Instruction tempStruct;
+
+
+int readFileESTAB(const char* input){
     ifstream file(input);
     string line;
     vector<string> temp;
@@ -416,14 +358,36 @@ int readFile(const char* input){
         while (getline(file, line)) {
             temp = split(line, ' ');
             lines.push_back(temp);
-            sourceCode.push_back(line);
-            instructionParse(temp);
+            testSourceCode.push_back(line);
             generateESTAB(temp,line);
         }
     }
     printESTAB();
     file.close();
     return 0;
+}
+
+void readFileObjectFile(const char* input){
+    map<string,ObjectFileLine> instructionMap;  
+
+    ifstream file(input);
+    string line;
+    vector<vector<string> > tokenized;
+    vector<string> sourceCode;
+    if (file.is_open()) {
+        while (getline(file, line)) {
+            vector<string> temp;
+            temp = split(line, ' ');
+            tokenized.push_back(temp);
+            sourceCode.push_back(line);
+        }
+    }
+    
+    instructionParse(sourceCode, tokenized);
+    //Call the generate Object file function here
+    printIndexes(sourceCode);
+    file.close();
+    return;
 }
 
 int main(int argc, char *argv[]){
@@ -437,11 +401,12 @@ int main(int argc, char *argv[]){
     }
 
     for(int i = 1; i < argc; i++){
-        readFile(argv[i]);
+        readFileESTAB(argv[i]);
+        readFileObjectFile(argv[i]);
     }
     printInstructions();
     printSourceCode();
-    printIndexes();
+
     return 0;
 }
 

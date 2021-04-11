@@ -1,0 +1,236 @@
+led.cpp: In function ‘int generateTextRecord(int, std::vector<std::basic_string<char> >, std::vector<std::vector<std::basic_string<char> > >)’:
+led.cpp:286:20: error: ‘struct TextRecord’ has no member named ‘relativeAddress’
+     textRecordData.relativeAddress = relAddress;
+                    ^
+led.cpp:298:28: error: ‘struct TextRecord’ has no member named ‘symbolName’
+             textRecordData.symbolName = tokenized[index][1];
+                            ^
+led.cpp:299:28: error: ‘struct TextRecord’ has no member named ‘instruction’
+             textRecordData.instruction = tokenized[index][2];
+                            ^
+led.cpp:300:28: error: ‘struct TextRecord’ has no member named ‘arguments’
+             textRecordData.arguments = tokenized[index][3];
+                            ^
+led.cpp:302:16: error: ‘instruct’ was not declared in this scope
+             if(instruct.size() > 3){
+                ^
+led.cpp:306:32: error: ‘struct TextRecord’ has no member named ‘objectCode’
+                 textRecordData.objectCode = x;
+                                ^
+led.cpp:311:28: error: ‘struct TextRecord’ has no member named ‘instruction’
+             textRecordData.instruction = tokenized[index][1]; //if no second column instruction is at index 1 of instruct vector
+                            ^
+led.cpp:312:28: error: ‘struct TextRecord’ has no member named ‘arguments’
+             textRecordData.arguments = tokenized[index][2]; 
+                            ^
+led.cpp:314:16: error: ‘instruct’ was not declared in this scope
+             if(instruct.size() > 3){
+                ^
+led.cpp:318:32: error: ‘struct TextRecord’ has no member named ‘objectCode’
+                 textRecordData.objectCode = x;
+                                ^
+led.cpp: In function ‘ObjectFileLine instructionParse(std::vector<std::basic_string<char> >, std::vector<std::vector<std::basic_string<char> > >)’:
+led.cpp:353:46: error: no match for ‘operator==’ (operand types are ‘std::basic_string<char>’ and ‘int’)
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                              ^
+led.cpp:353:46: note: candidates are:
+In file included from /usr/include/c++/4.8/bits/stl_algobase.h:64:0,
+                 from /usr/include/c++/4.8/bits/char_traits.h:39,
+                 from /usr/include/c++/4.8/string:40,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/stl_pair.h:214:5: note: template<class _T1, class _T2> bool std::operator==(const std::pair<_T1, _T2>&, const std::pair<_T1, _T2>&)
+     operator==(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+     ^
+/usr/include/c++/4.8/bits/stl_pair.h:214:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::pair<_T1, _T2>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/4.8/bits/char_traits.h:39,
+                 from /usr/include/c++/4.8/string:40,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/stl_iterator.h:291:5: note: template<class _Iterator> bool std::operator==(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_Iterator>&)
+     operator==(const reverse_iterator<_Iterator>& __x,
+     ^
+/usr/include/c++/4.8/bits/stl_iterator.h:291:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/4.8/bits/char_traits.h:39,
+                 from /usr/include/c++/4.8/string:40,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/stl_iterator.h:341:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_IteratorR>&)
+     operator==(const reverse_iterator<_IteratorL>& __x,
+     ^
+/usr/include/c++/4.8/bits/stl_iterator.h:341:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/bits/char_traits.h:40:0,
+                 from /usr/include/c++/4.8/string:40,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/postypes.h:216:5: note: template<class _StateT> bool std::operator==(const std::fpos<_StateT>&, const std::fpos<_StateT>&)
+     operator==(const fpos<_StateT>& __lhs, const fpos<_StateT>& __rhs)
+     ^
+/usr/include/c++/4.8/bits/postypes.h:216:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::fpos<_StateT>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/string:41:0,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/allocator.h:128:5: note: template<class _T1, class _T2> bool std::operator==(const std::allocator<_CharT>&, const std::allocator<_T2>&)
+     operator==(const allocator<_T1>&, const allocator<_T2>&)
+     ^
+/usr/include/c++/4.8/bits/allocator.h:128:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::allocator<_CharT>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/string:41:0,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/allocator.h:133:5: note: template<class _Tp> bool std::operator==(const std::allocator<_CharT>&, const std::allocator<_CharT>&)
+     operator==(const allocator<_Tp>&, const allocator<_Tp>&)
+     ^
+/usr/include/c++/4.8/bits/allocator.h:133:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::allocator<_CharT>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/string:52:0,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/basic_string.h:2486:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const std::basic_string<_CharT, _Traits, _Alloc>&)
+     operator==(const basic_string<_CharT, _Traits, _Alloc>& __lhs,
+     ^
+/usr/include/c++/4.8/bits/basic_string.h:2486:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   mismatched types ‘const std::basic_string<_CharT, _Traits, _Alloc>’ and ‘int’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/string:52:0,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/basic_string.h:2493:5: note: template<class _CharT> typename __gnu_cxx::__enable_if<std::__is_char<_Tp>::__value, bool>::__type std::operator==(const std::basic_string<_CharT>&, const std::basic_string<_CharT>&)
+     operator==(const basic_string<_CharT>& __lhs,
+     ^
+/usr/include/c++/4.8/bits/basic_string.h:2493:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   mismatched types ‘const std::basic_string<_CharT>’ and ‘int’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/string:52:0,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/basic_string.h:2507:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const _CharT*, const std::basic_string<_CharT, _Traits, _Alloc>&)
+     operator==(const _CharT* __lhs,
+     ^
+/usr/include/c++/4.8/bits/basic_string.h:2507:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   mismatched types ‘const _CharT*’ and ‘std::basic_string<char>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/string:52:0,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/basic_string.h:2519:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*)
+     operator==(const basic_string<_CharT, _Traits, _Alloc>& __lhs,
+     ^
+/usr/include/c++/4.8/bits/basic_string.h:2519:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   mismatched types ‘const _CharT*’ and ‘int’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/bits/locale_facets.h:48:0,
+                 from /usr/include/c++/4.8/bits/basic_ios.h:37,
+                 from /usr/include/c++/4.8/ios:44,
+                 from /usr/include/c++/4.8/ostream:38,
+                 from /usr/include/c++/4.8/iostream:39,
+                 from led.cpp:13:
+/usr/include/c++/4.8/bits/streambuf_iterator.h:204:5: note: template<class _CharT, class _Traits> bool std::operator==(const std::istreambuf_iterator<_CharT, _Traits>&, const std::istreambuf_iterator<_CharT, _Traits>&)
+     operator==(const istreambuf_iterator<_CharT, _Traits>& __a,
+     ^
+/usr/include/c++/4.8/bits/streambuf_iterator.h:204:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::istreambuf_iterator<_CharT, _Traits>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/map:60:0,
+                 from led.cpp:16:
+/usr/include/c++/4.8/bits/stl_tree.h:310:5: note: template<class _Val> bool std::operator==(const std::_Rb_tree_iterator<_Tp>&, const std::_Rb_tree_const_iterator<_Val>&)
+     operator==(const _Rb_tree_iterator<_Val>& __x,
+     ^
+/usr/include/c++/4.8/bits/stl_tree.h:310:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::_Rb_tree_iterator<_Tp>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/map:60:0,
+                 from led.cpp:16:
+/usr/include/c++/4.8/bits/stl_tree.h:907:5: note: template<class _Key, class _Val, class _KeyOfValue, class _Compare, class _Alloc> bool std::operator==(const std::_Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>&, const std::_Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>&)
+     operator==(const _Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>& __x,
+     ^
+/usr/include/c++/4.8/bits/stl_tree.h:907:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::_Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/map:61:0,
+                 from led.cpp:16:
+/usr/include/c++/4.8/bits/stl_map.h:962:5: note: template<class _Key, class _Tp, class _Compare, class _Alloc> bool std::operator==(const std::map<_Key, _Tp, _Compare, _Alloc>&, const std::map<_Key, _Tp, _Compare, _Alloc>&)
+     operator==(const map<_Key, _Tp, _Compare, _Alloc>& __x,
+     ^
+/usr/include/c++/4.8/bits/stl_map.h:962:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::map<_Key, _Tp, _Compare, _Alloc>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/map:62:0,
+                 from led.cpp:16:
+/usr/include/c++/4.8/bits/stl_multimap.h:864:5: note: template<class _Key, class _Tp, class _Compare, class _Alloc> bool std::operator==(const std::multimap<_Key, _Tp, _Compare, _Alloc>&, const std::multimap<_Key, _Tp, _Compare, _Alloc>&)
+     operator==(const multimap<_Key, _Tp, _Compare, _Alloc>& __x,
+     ^
+/usr/include/c++/4.8/bits/stl_multimap.h:864:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::multimap<_Key, _Tp, _Compare, _Alloc>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/vector:64:0,
+                 from led.cpp:17:
+/usr/include/c++/4.8/bits/stl_vector.h:1404:5: note: template<class _Tp, class _Alloc> bool std::operator==(const std::vector<_Tp, _Alloc>&, const std::vector<_Tp, _Alloc>&)
+     operator==(const vector<_Tp, _Alloc>& __x, const vector<_Tp, _Alloc>& __y)
+     ^
+/usr/include/c++/4.8/bits/stl_vector.h:1404:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const std::vector<_Tp, _Alloc>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h:33:0,
+                 from /usr/include/c++/4.8/bits/allocator.h:46,
+                 from /usr/include/c++/4.8/string:41,
+                 from led.cpp:10:
+/usr/include/c++/4.8/ext/new_allocator.h:139:5: note: template<class _Tp> bool __gnu_cxx::operator==(const __gnu_cxx::new_allocator<_Tp>&, const __gnu_cxx::new_allocator<_Tp>&)
+     operator==(const new_allocator<_Tp>&, const new_allocator<_Tp>&)
+     ^
+/usr/include/c++/4.8/ext/new_allocator.h:139:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const __gnu_cxx::new_allocator<_Tp>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/4.8/bits/char_traits.h:39,
+                 from /usr/include/c++/4.8/string:40,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/stl_iterator.h:811:5: note: template<class _Iterator, class _Container> bool __gnu_cxx::operator==(const __gnu_cxx::__normal_iterator<_Iterator, _Container>&, const __gnu_cxx::__normal_iterator<_Iterator, _Container>&)
+     operator==(const __normal_iterator<_Iterator, _Container>& __lhs,
+     ^
+/usr/include/c++/4.8/bits/stl_iterator.h:811:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const __gnu_cxx::__normal_iterator<_Iterator, _Container>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+In file included from /usr/include/c++/4.8/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/4.8/bits/char_traits.h:39,
+                 from /usr/include/c++/4.8/string:40,
+                 from led.cpp:10:
+/usr/include/c++/4.8/bits/stl_iterator.h:805:5: note: template<class _IteratorL, class _IteratorR, class _Container> bool __gnu_cxx::operator==(const __gnu_cxx::__normal_iterator<_IteratorL, _Container>&, const __gnu_cxx::__normal_iterator<_IteratorR, _Container>&)
+     operator==(const __normal_iterator<_IteratorL, _Container>& __lhs,
+     ^
+/usr/include/c++/4.8/bits/stl_iterator.h:805:5: note:   template argument deduction/substitution failed:
+led.cpp:353:49: note:   ‘std::basic_string<char>’ is not derived from ‘const __gnu_cxx::__normal_iterator<_IteratorL, _Container>’
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                 ^
+led.cpp:353:51: error: expected ‘)’ before ‘{’ token
+         if(str.compare(tokenized.at(i).at(0) == 0){
+                                                   ^
+led.cpp:358:5: error: expected primary-expression before ‘}’ token
+     }
+     ^
+led.cpp:358:5: error: expected ‘;’ before ‘}’ token
+led.cpp: In function ‘void readFileObjectFile(const char*)’:
+led.cpp:398:43: error: could not convert ‘tokenized’ from ‘std::vector<std::vector<std::basic_string<char> > >’ to ‘std::vector<std::basic_string<char> >’
+     instructionParse(tokenized, sourceCode);
+                                           ^
+
