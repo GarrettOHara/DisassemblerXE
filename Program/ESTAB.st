@@ -2,5 +2,3 @@ ADD       000000 000fc9
       COUNT 000020
       TABLE 000023
      TABLE2 0007f3
-WRITE       000fc9 00002c
-        LEN 000fef

@@ -237,10 +237,11 @@ void parseESTAB(){
             continue;
         else {
             unsigned int lowerBound = ESTAB[controlSection].address;
-            unsigned int upperBound = ESTAB[controlSection].length + lowerBound;
+            unsigned int upperBound = ESTAB[controlSection].length+lowerBound;
 
             if(address < lowerBound || address > upperBound){
-                string exceptionMessage = "ERROR: You are accessing illegal memory.";
+                string exceptionMessage = "ERROR: You are "
+                    "accessing illegal memory.";
                 throw(exceptionMessage);
             }
         }
@@ -292,7 +293,8 @@ void generateESTAB(vector<string> vec, string instruction){
             /*
              * Insert in vector if not already present
              */
-            if(find(insertionOrder.begin(), insertionOrder.end(), temp[i]) != insertionOrder.end()){
+            if(find(insertionOrder.begin(), insertionOrder.end(), 
+                    temp[i]) != insertionOrder.end()){
                 return;            
             } else {
                 insertionOrder.push_back(temp[i]);
@@ -312,7 +314,8 @@ void generateESTAB(vector<string> vec, string instruction){
             data.address = address + memoryLocation;
             data.instruction = arg;
             ESTAB[arg] = data;
-            if(find(insertionOrder.begin(), insertionOrder.end(), arg) != insertionOrder.end()){
+            if(find(insertionOrder.begin(), insertionOrder.end(), arg) 
+                    != insertionOrder.end()){
                 return;
             } else {
                 insertionOrder.push_back(arg);
@@ -334,8 +337,8 @@ void generateESTAB(vector<string> vec, string instruction){
     return;
 }
 
-void generateHeaderRecord(vector<string> sourceCode, vector<vector<string> > tokenized, string file){
-    //string temp = file;
+void generateHeaderRecord(vector<string> sourceCode, 
+        vector<vector<string> > tokenized, string file){
     string temp = file.substr(0, file.find(".",0));
     temp += ".obj";
 
@@ -345,9 +348,9 @@ void generateHeaderRecord(vector<string> sourceCode, vector<vector<string> > tok
 
     for(int i = 0; i < tokenized.size(); i++){
 
-        if(tokenized[i][0] == ".")
+        if(tokenized[i][0] == ".")       //skip comments
             continue;
-        else if(tokenized[i].size() < 3)     //When encounting the end record
+        else if(tokenized[i].size() < 3) //skip END record
             continue;
         else if(tokenized[i][2] == "START"){
             string reference = tokenized[i][1];
@@ -378,7 +381,8 @@ void generateHeaderRecord(vector<string> sourceCode, vector<vector<string> > tok
     return;
 }
 
-void generateDefinitionRecord(vector<string> sourceCode, vector<vector<string> > tokenized, string file){
+void generateDefinitionRecord(vector<string> sourceCode, 
+        vector<vector<string> > tokenized, string file){
     string temp = file.substr(0, file.find(".",0));
     temp += ".obj";
 
@@ -414,7 +418,8 @@ void generateDefinitionRecord(vector<string> sourceCode, vector<vector<string> >
     objectFile.close();
     return;
 }
-void generateReferenceRecord(vector<string> sourceCode, vector<vector<string> > tokenized, string file){
+void generateReferenceRecord(vector<string> sourceCode, 
+        vector<vector<string> > tokenized, string file){
     string temp = file.substr(0, file.find(".",0));
     temp += ".obj";
 
@@ -444,7 +449,8 @@ void generateReferenceRecord(vector<string> sourceCode, vector<vector<string> > 
 //we generate one line of the text record
 //should return new index
 //created 3/10 by viv
-int generateTextRecord(int index, vector<string> sourceCode, vector<vector<string> > tokenized){
+int generateTextRecord(int index, vector<string> sourceCode, 
+        vector<vector<string> > tokenized){
     ObjectFileLine data;
     //will need some sort of counter to make sure we are not going over size IE
     int counter;
@@ -493,11 +499,30 @@ int generateTextRecord(int index, vector<string> sourceCode, vector<vector<strin
     return index;   
 }
 
-void generateModificationRecord(vector<string> sourceCode, vector<vector<string> > tokenized, ofstream objectFile){
+void generateModificationRecord(vector<string> sourceCode, 
+        vector<vector<string> > tokenized, string file){
+    string temp = file.substr(0, file.find(".",0));
+    temp += ".obj";
+
+    ofstream objectFile;
+    objectFile.open(temp.c_str(), ios_base::app);
+
+
+    /**
+     * Two pass approach
+     * 
+     * Create a struct which has a memory address as an unsigned int, string for the symbol/object code 
+     **/
+    for(int i = 0; i < tokenized.size(); i++){
+        
+    }
     
+    objectFile.close();
+    return;
 }
 
-void generateEndRecord(vector<string> sourceCode, vector<vector<string> > tokenized, string file){
+void generateEndRecord(vector<string> sourceCode, 
+        vector<vector<string> > tokenized, string file){
     string temp = file.substr(0, file.find(".",0));
     temp += ".obj";
 
@@ -549,7 +574,8 @@ void generateEndRecord(vector<string> sourceCode, vector<vector<string> > tokeni
  * Note 4/9: make new function for header record (needs starting address and length of program)
  * //2D vector to compare
  **/
-ObjectFileLine instructionParse(vector<string> sourceCode, vector<vector<string> > tokenized){
+ObjectFileLine instructionParse(vector<string> sourceCode, 
+        vector<vector<string> > tokenized){
     struct ObjectFileLine structData;
 
     //call header, definiton, ref record here
