@@ -335,12 +335,13 @@ void generateESTAB(vector<string> vec, string instruction){
 }
 
 void generateHeaderRecord(vector<string> sourceCode, vector<vector<string> > tokenized, string file){
-    string temp = file;
+    //string temp = file;
+    string temp = file.substr(0, file.find(".",0));
     temp += ".obj";
+
 
     ofstream objectFile;
     objectFile.open(temp.c_str());
-
 
     for(int i = 0; i < tokenized.size(); i++){
 
@@ -432,12 +433,46 @@ int generateTextRecord(int index, vector<string> sourceCode, vector<vector<strin
     return index;   
 }
 
-void generateModificationRecord(vector<string> sourceCode, vector<vector<string> > tokenized){
-
+void generateModificationRecord(vector<string> sourceCode, vector<vector<string> > tokenized, ofstream objectFile){
+    
 }
 
-void generateEndRecord(vector<string> sourceCode, vector<vector<string> > tokenized){
+void generateEndRecord(vector<string> sourceCode, vector<vector<string> > tokenized, string file){
+    string temp = file.substr(0, file.find(".",0));
+    temp += ".obj";
 
+    ofstream objectFile;
+    objectFile.open(temp.c_str(), ios_base::app);
+
+    bool twoPass = false;
+    string symbol;
+    for(int i = 0; i < tokenized.size(); i++){
+
+        if(tokenized[i][0] != "END")
+            continue;
+        else if(tokenized[i].size() == 1)
+            objectFile << "E" << endl;
+        else {
+            symbol = tokenized[i][1];
+            twoPass = true;
+        }
+    }
+    if(twoPass){
+        string address;
+        for(int i = 0; i < tokenized.size(); i++){
+
+            if(tokenized[i][2] == symbol)
+                address = tokenized[i][0];
+            if(tokenized[i][0] == "END"){
+                objectFile << "E"
+                           << "^"
+                           << address
+                           << endl;
+            }
+        }
+    }
+    objectFile.close();
+    return;
 }
 
 /**
@@ -470,7 +505,7 @@ ObjectFileLine instructionParse(vector<string> sourceCode, vector<vector<string>
         //     break;
         // }
         if(tokenized.at(i).at(0) == "END"){
-            generateEndRecord(sourceCode, tokenized);
+            //generateEndRecord(sourceCode, tokenized);
             break;
         }
         //generateTextRecord(index, sourceCode, tokenized);
@@ -520,13 +555,20 @@ void readFileObjectFile(const char* input){
             sourceCode.push_back(line);
         }
     }
+    file.close();
 
-    generateHeaderRecord(sourceCode, tokenized, fileName);
-    
+    // string temp = input;
+    // temp += ".obj";
+
+    // ofstream objectFile;
+    // objectFile.open(temp.c_str());
+
+    generateHeaderRecord(sourceCode, tokenized, input);
+    generateEndRecord(sourceCode, tokenized, input);
     // instructionParse(sourceCode, tokenized);
     // //Call the generate Object file function here
     // printIndexes(sourceCode);
-    file.close();
+    //objectFile.close();
     return;
 }
 
