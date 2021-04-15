@@ -15,8 +15,6 @@
 #include <sstream>
 #include <map>
 #include <vector>
-#include <set>
-#include <algorithm>
 //trying to include regex c++ lib #include <boost/regex.hpp>
 
 using namespace std;
@@ -29,8 +27,8 @@ string programName;
 struct ESTABdata{
     string controlSection;
     string instruction;
-    unsigned int address;
-    unsigned int length;    
+    string address;
+    string length;    
 };
 
 /**
@@ -86,8 +84,6 @@ vector<ObjectFileLine> listingFile;
  * and the address as the value
  **/
 map<string,ESTABdata> ESTAB;
-// set<string> insertionOrder;
-vector<string> insertionOrder;
 
 /**
  * This 2D data structure is used store all of the instructions as
@@ -99,7 +95,6 @@ vector<vector<string> > lines;
  * This vector stores all of the lines of the source code as strings
  **/
 vector<string> testSourceCode;
-unsigned int memoryLocation = 0;
 
 // std::regex re(","); NEED to change the char delim to a regex obj for multiple deliminators
 vector<string> split(const string str, char delim) {
@@ -125,7 +120,7 @@ int printInstructions(){
 		}
 		printf("\n");
 	}
-    printf("-------------------------\n");
+    printf("-------------------------\n\n");
 	return 0;
 }
  void printSourceCode(){
@@ -136,11 +131,6 @@ int printInstructions(){
         printf("\n");
 	}
     printf("-------------------------\n");
-    cout << memoryLocation << endl;
-    stringstream stream;
-    stream << hex << memoryLocation;
-    string result( stream.str());
-    cout << result << endl;
 	return;
  }
 
@@ -169,155 +159,102 @@ int printInstructions(){
  }
 
 void printESTAB(){
-    ofstream ESTABfile;
-    ESTABfile.open("ESTAB.st");
+    /**
+     * Order contents in map by address
+     * Write to file
+     * Call a check proper address function before
+     * this to throw an error
+     **/
     printf("\nESTAB:\n------------------------\n");
-    for(int i = 0; i < insertionOrder.size(); i++){
-        cout << "value: " << insertionOrder[i] << endl;
-        string str = insertionOrder[i];
-        if(str == "")
+    map<string, ESTABdata>::iterator it;
+    for(it = ESTAB.begin(); it != ESTAB.end(); it++){
+        if(it->first == "")
             continue;
-        else if (ESTAB[str].instruction == ""){
-            stringstream stream;
-            stream << hex << ESTAB[str].address;
-            string address( stream.str());
-            stream << hex << ESTAB[str].length;
-            string length( stream.str() );
-            cout << "Address: " << address << endl;
-            cout << "Lenght:  " << length << endl;
-            ESTABfile << str
+        else if (it->second.instruction == ""){
+            cout << it->first
                  << "       "
-                 << setw(4)
+                 << setw(5)
                  << setfill('0')
-                 << address
                  << " "
+                 << it->second.address
                  << setw(3)
-                 << length
+                 << it->second.length
                  << endl;
         }
-        else if(ESTAB[str].instruction != ""){
-            stringstream stream;
-            stream << hex << ESTAB[str].address;
-            string address( stream.str());
-            ESTABfile << " "
+        else if(it->second.instruction != ""){
+            cout << " "
                  << setw(10)
                  << setfill(' ')
-                 << str
+                 << it->first
                  << " "
                  << setw(4)
                  << setfill('0')
-                 << address
+                 << it->second.address
                  << endl;
         }
     }
-    printf("------------------------\n");
+    printf("\n------------------------\n\n");
     return;
 }
-//int count;
+int count;
 void generateESTAB(vector<string> vec, string instruction){
-    /**
-     * This function needs to parse the lines vector for
-     * EXTDEF and EXTREF then adds all the symbols defined here
-     * to the ESTAB with the addresses realative to the program.
-     * 
-     * When the symbol is parsed in the first pass of the linker, the 
-     * actual address is updated in the ESTAB
-     **/
+
     ESTABdata data;
-    // if(vec.size() < 3){
-    //     cout << "Contents of vect:" << vec[0] << endl;
-    // } else {
-    //     cout << "Contents of vect:" 
-    //          << vec[1]
-    //          << setw(3)
-    //          << " "
-    //          << setfill(' ')
-    //          <<  vec[2] << endl;
-    // }
+
+    if(vec.size() < 3){
+        cout << "Contents of vect:" << vec[0] << endl;
+    } else {
+        cout << "Contents of vect:" 
+             << vec[1]
+             << setw(3)
+             << " "
+             << setfill(' ')
+             <<  vec[2] << endl;
+    }
     if(vec.size() == 0 || vec[0] == ".")
         return;
-    else if(vec.size() < 3)     //When encounting the end record
+    else if(vec.size() < 3) 
         return;
     else if(vec[2] == "START"){
-        unsigned int address;
-        unsigned int length;
-        istringstream converter(vec[0].c_str());
-        converter >> hex >> address;
-        istringstream cast(vec[2].c_str());
-        cast >> hex >> length;
-
         programName = vec[1];
         data.controlSection = programName;
-        data.address = address + memoryLocation;
-        //data.length = length;
+        unsigned int address;
+        istringstream converter(vec[0].c_str());
+        converter >> hex >> address;
+        data.address = atoi(vec[0].c_str());
+        data.length = atoi(vec[2].c_str());
         ESTAB[programName] = data;
-        insertionOrder.push_back(programName);
     }
-    else if(vec[1] == "EXTDEF"){//|| vec[1] == "EXTREF"){
-
-        vector<string> temp = split(vec[2], ',');
-        for(vector<string>::size_type i = 0; i != temp.size(); i++){
-            unsigned int address;
-            istringstream converter(vec[0].c_str());
-            converter >> hex >> address;
-            cout << "items being parsed: " << temp[i] << endl;
-            data.address = address;
-            data.controlSection = programName;
-            data.instruction = temp[i];
-            ESTAB[temp[i]] = data;
-
-            /*
-             * Insert in vector if not already present
-             */
-            if(find(insertionOrder.begin(), insertionOrder.end(), temp[i]) != insertionOrder.end()){
-                return;            
-            } else {
-                insertionOrder.push_back(temp[i]);
-            }
-        }
-        
-
+    else if(vec[1] == "EXTDEF" || vec[1] == "EXTREF"){
+        cout << "COUNT: " << count << endl;
+        string arg = vec[2];
+        cout << "Argument: " << arg << endl;
+        data.controlSection = programName;
+        data.address = atoi(vec[0].c_str());
+        data.instruction = arg;
+        ESTAB[arg] = data;
     }
     else if(vec[2] == "WORD" || vec[2] == "RESW"){
         string arg = vec[1];
         if(ESTAB.count(arg)){
-            unsigned int address;
-            istringstream converter(vec[0].c_str());
-            converter >> hex >> address;
-
             data.controlSection = programName;
-            data.address = address + memoryLocation;
+            data.address = atoi(vec[0].c_str());
             data.instruction = arg;
             ESTAB[arg] = data;
-            if(find(insertionOrder.begin(), insertionOrder.end(), arg) != insertionOrder.end()){
-                return;
-            } else {
-                insertionOrder.push_back(arg);
-            }
         }
-        // map<string,ESTABdata>::iterator it = ESTAB.find(arg);
-        // if(it != ESTAB.end()){
-        //     data.controlSection = programName;
-        //     data.address = atoi(vec[0].c_str());
-        //     data.instruction = arg;
-        //     ESTAB[arg] = data;
-        // }
     }
     else if(vec[2] == "=C'EOF'"){
-        unsigned int length = atoi(vec[0].c_str());
-        cout << "XXXXXX" << programName << " : " << length << endl;
+        unsigned int val = ESTAB[programName].length;
+        unsigned int length;
         istringstream converter(vec[0].c_str());
         converter >> hex >> length;
-        cout << "XXXXXX" << programName << " : " << length << endl;
-        ESTAB[programName].length = length;
-        if(memoryLocation == 0)
-            memoryLocation = length;
-        else
-            memoryLocation += length;
+        ESTAB[programName].length = length - val;
     }
-    //count++;
+    count++;
     return;
 }
+
+
 
 void generateHeaderRecord(vector<string> sourceCode, vector<vector<string> > tokenized){
     
@@ -387,35 +324,12 @@ void generateEndRecord(vector<string> sourceCode, vector<vector<string> > tokeni
 
 }
 
-/**
- * How to address column two of the listing file
- * 
- * Create a cosntant time lookup hashtable to check if the second element in the 
- * vector is a instruction 
- * if its not then its either the prorgam name or a custom (programmer defined) symbol
- * 
- * this will allow us to set the correct field for the struct and store it in the vector
- * Note 4/8: not making multiple instances of this struct, creating one and overriding it each time,
- * wherever you initialize you can also use it in the scope of the function, 
- * but I wonder if we can still access it if we pass the struct to other functions, maybe have the function return a struct?
- * Note 4/9: make new function for header record (needs starting address and length of program)
- * //2D vector to compare
- **/
+
 ObjectFileLine instructionParse(vector<string> sourceCode, vector<vector<string> > tokenized){
     struct ObjectFileLine structData;
 
-    //call header, definiton, ref record here
-
-    //line 4 is where program starts, estab take getting taken care of separately
-    //do avoid hard coding int 4, find where First starts
-    //3/10: this will need to be a nested for loop?
     for(int i = 4; i < sourceCode.size(); i++){
-        //if first item in index = END directive, special case, else first item = rel address
-        // string str = "END";
-        // if(str.compare(tokenized.at(i).at(0) == 0)){
-        //     generateEndRecord(sourceCode, tokenized);
-        //     break;
-        // }
+
         if(tokenized.at(i).at(0) == "END"){
             generateEndRecord(sourceCode, tokenized);
             break;
@@ -430,14 +344,14 @@ int readFileESTAB(const char* input){
     ifstream file(input);
     string line;
     vector<string> temp;
-    //count = 0;
+    count = 0;
     if (file.is_open()) {
         while (getline(file, line)) {
             temp = split(line, ' ');
             lines.push_back(temp);
             testSourceCode.push_back(line);
             generateESTAB(temp,line);
-            //sortESTAB();
+            //ESTAB = sortESTAB(ESTAB);
         }
     }
     printESTAB();
@@ -482,50 +396,8 @@ int main(int argc, char *argv[]){
         readFileESTAB(argv[i]);
         //readFileObjectFile(argv[i]);
     }
-    // printInstructions();
-    // printSourceCode();
+    printInstructions();
+    printSourceCode();
 
     return 0;
 }
-
-/**
- * This is a notes section
- * 
- * main method must be at bottom. Probably just when not in a class.
- * 
- * ELF/ in the outpusourceCodeddress of the symbol
- * 
- * 
- * Helpful Resources: 
- * Page 143 in the textbook (159 of PDF)
- * Shows the "toString" of the ESTAB which can also be refered to as load map
- * 
- * 
- * Object File
- * 
- * 
- * Question: 
- *  - How do we know how long a text record line is
- *  - How do we know what kind of instruction something is format 3,4?
- *  - Is calculating the actual address really just the actual address of the
- *    program + the realative address of the symbol
- *  - How do we make the header record for the Object File
- *  - Do we only add the object code for the main program and then put the
- *    modification records for the external symbol references
- * 
- * 
- * Edge Cases: 
- *  - External Symbol that is not defined in the EXDEF is encountered
- *    program must cease execution giving the error (I can see him doing this case)
- *  - What if first pass we notice that the first file in the arguments list isnt main
- *    program?
- *      - I would assume hault execution and sepcify that you need ot have the main program
- *        first would be enough
- * 
- * To Do's:
- *  - understand how texts records are generated (and header, mod, and end records)
- *  - how to read and store important values from listing files/source code
- *  - Garret idea: working on split function that will split ever line into strings and each 
- * line will be stored in a vector of vectors 
- *  - let's start brainstorming what exactly the object file needs
- **/
