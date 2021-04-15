@@ -1,6 +1,6 @@
-ADD       0000 0fc6
-      COUNT 0020
-      TABLE 0023
-     TABLE2 07f3
-WRITE       0000 0029
-        LEN 0fec
+ADD       000000 000fc9
+      COUNT 000020
+      TABLE 000023
+     TABLE2 0007f3
+WRITE       000fc9 00002c
+        LEN 000fef

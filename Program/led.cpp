@@ -48,10 +48,11 @@ struct ObjectFileLine{
         unsigned int length;
     };
     struct DefinitionRecord{
-
+        vector<string> symbols;
+        vector<unsigned int> addresses;
     };
     struct ReferenceRecord{
-
+        vector<string> symbols;
     };
     struct TextRecord{
         unsigned int relativeAddress;
@@ -61,10 +62,12 @@ struct ObjectFileLine{
         vector<unsigned int> objectCodes;
     };
     struct ModificationRecord{
-
+        unsigned int length;
+        unsigned int nibbles;
+        string mod;
     };
     struct EndRecord{
-
+        unsigned int address;
     };
     struct HeaderRecord header;
     struct DefinitionRecord definition;
@@ -108,6 +111,7 @@ vector<string> testSourceCode;
  * This variable updates the global memory scope when reading listing files
  **/
 unsigned int memoryLocation = 0;
+unsigned int MEMORY;
 
 vector<string> split(const string str, char delim) {
     vector<string> result;
@@ -143,11 +147,6 @@ int printInstructions(){
         printf("\n");
 	}
     printf("-------------------------\n");
-    cout << memoryLocation << endl;
-    stringstream stream;
-    stream << hex << memoryLocation;
-    string result( stream.str());
-    cout << result << endl;
 	return;
  }
 
@@ -186,18 +185,22 @@ void printESTAB(){
             unsigned int len = ESTAB[str].length;
             unsigned int addy = ESTAB[str].address;
 
-            stringstream stream;
-            string address( stream.str() );
-            stream << hex << len;
-            string length( stream.str() );
+            stringstream streamA;
+            streamA << hex << addy;
+            string address( streamA.str() );
+
+            stringstream streamB;
+            streamB << hex << len;
+            string length( streamB.str() );
+
 
             ESTABfile << str
                  << "       "
-                 << setw(4)
+                 << setw(6)
                  << setfill('0')
                  << address
                  << " "
-                 << setw(4)
+                 << setw(6)
                  << length
                  << endl;
         }
@@ -211,7 +214,7 @@ void printESTAB(){
                  << setfill(' ')
                  << str
                  << " "
-                 << setw(4)
+                 << setw(6)
                  << setfill('0')
                  << address
                  << endl;
@@ -321,17 +324,56 @@ void generateESTAB(vector<string> vec, string instruction){
         istringstream converter(vec[0].c_str());
         converter >> hex >> length;
         
-        ESTAB[programName].length = length;
+        ESTAB[programName].length = length+3;
+        MEMORY = length+3;
         if(memoryLocation == 0)
-            memoryLocation = length;
+            memoryLocation = length+3;
         else
             memoryLocation += length;
     }
     return;
 }
 
-void generateHeaderRecord(vector<string> sourceCode, vector<vector<string> > tokenized){
-    
+void generateHeaderRecord(vector<string> sourceCode, vector<vector<string> > tokenized, string file){
+    string temp = file;
+    temp += ".obj";
+
+    ofstream objectFile;
+    objectFile.open(temp.c_str());
+
+
+    for(int i = 0; i < tokenized.size(); i++){
+
+        if(tokenized[i][0] == ".")
+            continue;
+        else if(tokenized[i].size() < 3)     //When encounting the end record
+            continue;
+        else if(tokenized[i][2] == "START"){
+            string reference = tokenized[i][1];
+            unsigned int address = ESTAB[reference].address;
+            unsigned int length = ESTAB[reference].length;
+            
+            stringstream stream;
+            stream << hex << address;
+            string addy(stream.str());
+            stream << hex << length;
+            string len(stream.str());
+
+            objectFile << "H"
+                 << "^"
+                 << reference
+                 << "^"
+                 << setfill('0')
+                 << setw(6)
+                 << addy
+                 << "^"
+                 << setw(6)
+                 << len
+                 << endl;
+        }
+    }
+    objectFile.close();
+    return;
 }
 
 void generateDefinitionRecord(vector<string> sourceCode, vector<vector<string> > tokenized){
@@ -436,12 +478,10 @@ ObjectFileLine instructionParse(vector<string> sourceCode, vector<vector<string>
         
     return structData;    
 }
-
 int readFileESTAB(const char* input){
     ifstream file(input);
     string line;
     vector<string> temp;
-    //count = 0;
     if (file.is_open()) {
         while (getline(file, line)) {
             temp = split(line, ' ');
@@ -456,13 +496,17 @@ int readFileESTAB(const char* input){
         cout << error << endl;
         exit(0);
     }
+
     printESTAB();
     file.close();
     return 0;
 }
 
 void readFileObjectFile(const char* input){
-    map<string,ObjectFileLine> instructionMap;  
+    map<string,ObjectFileLine> instructionMap;
+
+    string temp = input;
+    string fileName = temp.substr(0,temp.find(".",0));
 
     ifstream file(input);
     string line;
@@ -476,10 +520,12 @@ void readFileObjectFile(const char* input){
             sourceCode.push_back(line);
         }
     }
+
+    generateHeaderRecord(sourceCode, tokenized, fileName);
     
-    instructionParse(sourceCode, tokenized);
-    //Call the generate Object file function here
-    printIndexes(sourceCode);
+    // instructionParse(sourceCode, tokenized);
+    // //Call the generate Object file function here
+    // printIndexes(sourceCode);
     file.close();
     return;
 }
@@ -496,7 +542,7 @@ int main(int argc, char *argv[]){
 
     for(int i = 1; i < argc; i++){
         readFileESTAB(argv[i]);
-        //readFileObjectFile(argv[i]);
+        readFileObjectFile(argv[i]);
     }
     printInstructions();
     printSourceCode();
