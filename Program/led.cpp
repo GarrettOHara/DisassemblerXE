@@ -13,15 +13,16 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 #include <map>
 #include <vector>
 #include <set>
 #include <algorithm>
-//trying to include regex c++ lib #include <boost/regex.hpp>
 
 using namespace std;
 
 string programName;
+
 /**
  * Non initialized values could run into a runtime error
  * because there is no constructor
@@ -86,7 +87,10 @@ vector<ObjectFileLine> listingFile;
  * and the address as the value
  **/
 map<string,ESTABdata> ESTAB;
-// set<string> insertionOrder;
+
+/**
+ * This vector is used to memorize the insertion order within the ESTAB
+ **/
 vector<string> insertionOrder;
 
 /**
@@ -99,9 +103,12 @@ vector<vector<string> > lines;
  * This vector stores all of the lines of the source code as strings
  **/
 vector<string> testSourceCode;
+
+/**
+ * This variable updates the global memory scope when reading listing files
+ **/
 unsigned int memoryLocation = 0;
 
-// std::regex re(","); NEED to change the char delim to a regex obj for multiple deliminators
 vector<string> split(const string str, char delim) {
     vector<string> result;
     istringstream ss(str);
@@ -171,27 +178,26 @@ int printInstructions(){
 void printESTAB(){
     ofstream ESTABfile;
     ESTABfile.open("ESTAB.st");
-    printf("\nESTAB:\n------------------------\n");
     for(int i = 0; i < insertionOrder.size(); i++){
-        cout << "value: " << insertionOrder[i] << endl;
         string str = insertionOrder[i];
         if(str == "")
             continue;
         else if (ESTAB[str].instruction == ""){
+            unsigned int len = ESTAB[str].length;
+            unsigned int addy = ESTAB[str].address;
+
             stringstream stream;
-            stream << hex << ESTAB[str].address;
-            string address( stream.str());
-            stream << hex << ESTAB[str].length;
+            string address( stream.str() );
+            stream << hex << len;
             string length( stream.str() );
-            cout << "Address: " << address << endl;
-            cout << "Lenght:  " << length << endl;
+
             ESTABfile << str
                  << "       "
                  << setw(4)
                  << setfill('0')
                  << address
                  << " "
-                 << setw(3)
+                 << setw(4)
                  << length
                  << endl;
         }
@@ -199,6 +205,7 @@ void printESTAB(){
             stringstream stream;
             stream << hex << ESTAB[str].address;
             string address( stream.str());
+
             ESTABfile << " "
                  << setw(10)
                  << setfill(' ')
@@ -210,10 +217,33 @@ void printESTAB(){
                  << endl;
         }
     }
-    printf("------------------------\n");
     return;
 }
-//int count;
+
+void parseESTAB(){
+    map<string,ESTABdata>::iterator it;
+    for(it = ESTAB.begin(); it != ESTAB.end(); it++){
+        string reference = it->first;
+        
+        string controlSection = ESTAB[reference].controlSection;
+        string instruction = ESTAB[reference].instruction;
+        unsigned int address = ESTAB[reference].address;
+        unsigned int length = ESTAB[reference].length;
+
+        if(instruction == "")
+            continue;
+        else {
+            unsigned int lowerBound = ESTAB[controlSection].address;
+            unsigned int upperBound = ESTAB[controlSection].length + lowerBound;
+
+            if(address < lowerBound || address > upperBound){
+                string exceptionMessage = "ERROR: You are accessing illegal memory.";
+                throw(exceptionMessage);
+            }
+        }
+    }
+}
+
 void generateESTAB(vector<string> vec, string instruction){
     /**
      * This function needs to parse the lines vector for
@@ -224,16 +254,7 @@ void generateESTAB(vector<string> vec, string instruction){
      * actual address is updated in the ESTAB
      **/
     ESTABdata data;
-    // if(vec.size() < 3){
-    //     cout << "Contents of vect:" << vec[0] << endl;
-    // } else {
-    //     cout << "Contents of vect:" 
-    //          << vec[1]
-    //          << setw(3)
-    //          << " "
-    //          << setfill(' ')
-    //          <<  vec[2] << endl;
-    // }
+    
     if(vec.size() == 0 || vec[0] == ".")
         return;
     else if(vec.size() < 3)     //When encounting the end record
@@ -249,18 +270,17 @@ void generateESTAB(vector<string> vec, string instruction){
         programName = vec[1];
         data.controlSection = programName;
         data.address = address + memoryLocation;
-        //data.length = length;
         ESTAB[programName] = data;
         insertionOrder.push_back(programName);
     }
-    else if(vec[1] == "EXTDEF"){//|| vec[1] == "EXTREF"){
+    else if(vec[1] == "EXTDEF"){
 
         vector<string> temp = split(vec[2], ',');
         for(vector<string>::size_type i = 0; i != temp.size(); i++){
             unsigned int address;
             istringstream converter(vec[0].c_str());
             converter >> hex >> address;
-            cout << "items being parsed: " << temp[i] << endl;
+
             data.address = address;
             data.controlSection = programName;
             data.instruction = temp[i];
@@ -295,27 +315,18 @@ void generateESTAB(vector<string> vec, string instruction){
                 insertionOrder.push_back(arg);
             }
         }
-        // map<string,ESTABdata>::iterator it = ESTAB.find(arg);
-        // if(it != ESTAB.end()){
-        //     data.controlSection = programName;
-        //     data.address = atoi(vec[0].c_str());
-        //     data.instruction = arg;
-        //     ESTAB[arg] = data;
-        // }
     }
     else if(vec[2] == "=C'EOF'"){
         unsigned int length = atoi(vec[0].c_str());
-        cout << "XXXXXX" << programName << " : " << length << endl;
         istringstream converter(vec[0].c_str());
         converter >> hex >> length;
-        cout << "XXXXXX" << programName << " : " << length << endl;
+        
         ESTAB[programName].length = length;
         if(memoryLocation == 0)
             memoryLocation = length;
         else
             memoryLocation += length;
     }
-    //count++;
     return;
 }
 
@@ -437,8 +448,13 @@ int readFileESTAB(const char* input){
             lines.push_back(temp);
             testSourceCode.push_back(line);
             generateESTAB(temp,line);
-            //sortESTAB();
         }
+    }
+    try{
+        parseESTAB();
+    } catch(string error){
+        cout << error << endl;
+        exit(0);
     }
     printESTAB();
     file.close();
@@ -482,8 +498,8 @@ int main(int argc, char *argv[]){
         readFileESTAB(argv[i]);
         //readFileObjectFile(argv[i]);
     }
-    // printInstructions();
-    // printSourceCode();
+    printInstructions();
+    printSourceCode();
 
     return 0;
 }
