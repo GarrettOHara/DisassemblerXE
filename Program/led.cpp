@@ -354,11 +354,12 @@ void generateHeaderRecord(vector<string> sourceCode, vector<vector<string> > tok
             unsigned int address = ESTAB[reference].address;
             unsigned int length = ESTAB[reference].length;
             
-            stringstream stream;
-            stream << hex << address;
-            string addy(stream.str());
-            stream << hex << length;
-            string len(stream.str());
+            stringstream streamA;
+            stringstream streamB;
+            streamA << hex << address;
+            string addy(streamA.str());
+            streamB << hex << length;
+            string len(streamB.str());
 
             objectFile << "H"
                  << "^"
@@ -377,8 +378,67 @@ void generateHeaderRecord(vector<string> sourceCode, vector<vector<string> > tok
     return;
 }
 
-void generateDefinitionRecord(vector<string> sourceCode, vector<vector<string> > tokenized){
+void generateDefinitionRecord(vector<string> sourceCode, vector<vector<string> > tokenized, string file){
+    string temp = file.substr(0, file.find(".",0));
+    temp += ".obj";
+
+    ofstream objectFile;
+    objectFile.open(temp.c_str(), ios_base::app);
+
+    for(int i = 0; i < tokenized.size(); i++){
+        if(tokenized[i][0] == ".")
+            continue;
+        else if(tokenized[i].size() < 3)
+            continue;
+        else if(tokenized[i][1] == "EXTDEF"){
+            objectFile << "D";
+            vector<string> symbols = split(tokenized[i][2], ',');
+            for(int i = 0; i < symbols.size(); i++){
+                unsigned int address = ESTAB[symbols[i]].address;
+                
+                stringstream stream;
+                stream << hex << address;
+                string addy(stream.str());
+
+                objectFile << "^"
+                           << symbols[i]
+                           << "^"
+                           << setw(6)
+                           << setfill('0')
+                           << addy;
+            }
+            objectFile << endl;
+        }
+    }
     
+    objectFile.close();
+    return;
+}
+void generateReferenceRecord(vector<string> sourceCode, vector<vector<string> > tokenized, string file){
+    string temp = file.substr(0, file.find(".",0));
+    temp += ".obj";
+
+    ofstream objectFile;
+    objectFile.open(temp.c_str(), ios_base::app);
+
+    for(int i = 0; i < tokenized.size(); i++){
+        if(tokenized[i][0] == ".")
+            continue;
+        else if(tokenized[i].size() < 3)
+            continue;
+        else if(tokenized[i][1] == "EXTREF"){
+            objectFile << "R";
+            vector<string> symbols = split(tokenized[i][2], ',');
+            for(int i = 0; i < symbols.size(); i++){
+                objectFile << "^"
+                           << symbols[i];
+            }
+            objectFile << endl;
+        }
+    }
+    
+    objectFile.close();
+    return;
 }
 
 //we generate one line of the text record
@@ -564,6 +624,8 @@ void readFileObjectFile(const char* input){
     // objectFile.open(temp.c_str());
 
     generateHeaderRecord(sourceCode, tokenized, input);
+    generateDefinitionRecord(sourceCode, tokenized, input);
+    generateReferenceRecord(sourceCode, tokenized, input);
     generateEndRecord(sourceCode, tokenized, input);
     // instructionParse(sourceCode, tokenized);
     // //Call the generate Object file function here
