@@ -514,6 +514,8 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
 
             if(i == tokenized.size())                //if i is out of range
                 break;
+            if(tokenized[i][2] == "WORD" || tokenized[i][2] == "RESW")
+                break;
             if(tokenized[i][0] == "."){              //Comment
                 i++; continue;
             }
@@ -560,12 +562,12 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
         stringstream streamB;
         streamB << hex << size;
         string SIZE(streamB.str());
-        cout << file << endl;
-        cout << "T" 
+        //objectFile << file << endl;
+        objectFile << "T" 
              << "^" 
              << setw(6) 
              << setfill('0') 
-             << MEMORY 
+             << MEMORY
 
              << "^" 
              << setw(2) 
@@ -573,14 +575,15 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
              << SIZE;
 
         for(int j = 0; j < codes.size(); j++){
-            cout << "^"
+            objectFile << "^"
                  << codes[j];
         }
-        cout << endl;
-
+        objectFile << endl;
+        cout << tokenized.size() << ": " << i << endl;
         tempMem = memory;
         size = 0;
         codes.clear();
+        i--;
     }
 
     int programSize = tokenized.size()-1;
@@ -589,14 +592,14 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
     streamC << hex << programLength;
     string PROGLENGTH(streamC.str());
 
-    cout << "T" << "^"
+    objectFile << "T" << "^"
          << setw(6) << setfill('0') 
          << PROGLENGTH << "^"
          << "03" << "^"
          << setw(6) << setfill('0') 
          << tokenized[programSize][3] 
          << endl;
-    cout << "\n\n";
+    //objectFile << "\n\n";
     
 
     objectFile.close();
@@ -736,7 +739,8 @@ void generateEndRecord(vector<vector<string> > tokenized, string file){
     bool twoPass = false;
     string symbol;
     for(int i = 0; i < tokenized.size(); i++){
-
+        if(tokenized[i][0] == ".")
+            continue;
         if(tokenized[i][0] != "END")
             continue;
         else if(tokenized[i].size() == 1)
@@ -747,16 +751,16 @@ void generateEndRecord(vector<vector<string> > tokenized, string file){
         }
     }
     if(twoPass){
-        string address;
-        for(int i = 0; i < tokenized.size(); i++){
-
-            if(tokenized[i][2] == symbol)
-                address = tokenized[i][0];
-            if(tokenized[i][0] == "END"){
+        string address = "";
+        for(int j = 1; j < tokenized.size(); j++){
+            if(tokenized[j][1] == symbol)
+                address = tokenized[j][0];
+            if(address != ""){
                 objectFile << "E"
                            << "^"
                            << address
                            << endl;
+                break;
             }
         }
     }
