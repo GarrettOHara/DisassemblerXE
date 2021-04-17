@@ -303,8 +303,7 @@ void generateESTAB(vector<string> vec, string instruction){
     return;
 }
 
-void generateHeaderRecord(vector<string> sourceCode, 
-        vector<vector<string> > tokenized, string file){
+void generateHeaderRecord(vector<vector<string> > tokenized, string file){
     string temp = file.substr(0, file.find(".",0));
     temp += ".obj";
 
@@ -347,8 +346,7 @@ void generateHeaderRecord(vector<string> sourceCode,
     return;
 }
 
-void generateDefinitionRecord(vector<string> sourceCode, 
-        vector<vector<string> > tokenized, string file){
+void generateDefinitionRecord(vector<vector<string> > tokenized, string file){
     string temp = file.substr(0, file.find(".",0));
     temp += ".obj";
 
@@ -384,8 +382,7 @@ void generateDefinitionRecord(vector<string> sourceCode,
     objectFile.close();
     return;
 }
-void generateReferenceRecord(vector<string> sourceCode, 
-        vector<vector<string> > tokenized, string file){
+void generateReferenceRecord(vector<vector<string> > tokenized, string file){
     string temp = file.substr(0, file.find(".",0));
     temp += ".obj";
 
@@ -464,6 +461,156 @@ void generateReferenceRecord(vector<string> sourceCode,
 //     }
 //     return index;   
 // }
+
+void generateTextRecord(vector<vector<string> > tokenized, string file){
+    string temp = file.substr(0, file.find(".",0));
+    temp += ".obj";
+    ofstream objectFile;
+    objectFile.open(temp.c_str(), ios_base::app);
+
+    const unsigned int textSize = 30;
+    unsigned int size=0;
+    unsigned int memory=0;
+    unsigned int tempMem=0;
+    vector<string> codes;
+    /**
+     * NEW APPROACH: 
+     * Parse lines to see what index of i to move to
+     * store in something, store memory counter for after memory location
+     * 
+     * memory gets updated with each object code
+     * textSize is the constant for each size fo the line
+     * 
+     * for each op code
+     * size keeps track of current line
+     * put op code in codes
+     * 
+     * break wile loop when size !<= textSize
+     * print out contents of codes
+     * 
+     * T^tempMem^size^codes...
+     * use tempMem as the previous location
+     * size as the counter for that line
+     * codes contains all op codes for line
+     * 
+     * clear codes
+     * tempMem = memory
+     * size = 0
+     * 
+     * repeat
+     * 
+     * 
+     **/
+    for(int i = 4; i < tokenized.size(); i++){
+        
+        if(tokenized[i][0] == ".")              //Comment
+            continue;
+        if(tokenized[i][2] == "WORD" || tokenized[i][2] == "RESW")
+            break;
+        else if(tokenized[i].size() < 4)       //End Record
+            continue;
+        
+        while(true){
+            // cout << "i: " << i << endl;
+            // for(int j = 0; j < tokenized[i].size(); j++)
+            //     cout << tokenized[i][j] << endl;
+            //     cout << "\n\n";
+            // for(int j = 0; j < codes.size(); j++){
+            //     cout <<  codes[j] << endl;
+            // }
+
+            if(i == tokenized.size()){
+                break;
+            }
+            if(tokenized[i][0] == "."){              //Comment
+                i++; continue;
+            }
+            else if(tokenized[i].size() < 4){       //End Record
+                i++; continue;
+            }
+
+            if(tokenized[i].size()==5){        //column 2 present
+                string str = tokenized[i][4];
+                if(str.size() > 6){
+                    if(size+4 <= textSize){
+                        codes.push_back(str);
+                        size+=4; memory+=4; i++;
+                    } else
+                        break;
+                }else{
+                    if(size+3 <= textSize){
+                        codes.push_back(str);
+                        size+=3; memory+=3; i++;
+                    }else
+                        break;
+                }
+            }else{                          //column 2 not present
+                string str = tokenized[i][3];
+                if(str.size() > 6){
+                    if(size+4 <= textSize){
+                        codes.push_back(str);
+                        size+=4; memory+=4; i++;
+                    }else
+                        break;
+                }else{
+                    if(size+3 <= textSize){
+                        codes.push_back(str);
+                        size+=3; memory+=3; i++;
+                    }else
+                        break;
+                }
+            }
+        }
+        stringstream streamA;
+        streamA << hex << tempMem;
+        string MEMORY(streamA.str());
+
+        stringstream streamB;
+        streamB << hex << size;
+        string SIZE(streamB.str());
+        cout << file << endl;
+        cout << "T" 
+             << "^" 
+             << setw(6) 
+             << setfill('0') 
+             << MEMORY 
+
+             << "^" 
+             << setw(2) 
+             << setfill('0') 
+             << SIZE;
+
+        for(int j = 0; j < codes.size(); j++){
+            cout << "^"
+                 << codes[j];
+        }
+        
+        cout << endl;
+
+        tempMem = memory;
+        size = 0;
+        codes.clear();
+    }
+
+    int programSize = tokenized.size()-1;
+    unsigned int programLength = ESTAB[programName].length;
+    stringstream streamC;
+    streamC << hex << programLength;
+    string PROGLENGTH(streamC.str());
+
+    cout << "T" << "^"
+         << setw(6) << setfill('0') 
+         << PROGLENGTH << "^"
+         << "03" << "^"
+         << setw(6) << setfill('0') 
+         << tokenized[programSize][3] 
+         << endl;
+    cout << "\n\n";
+    
+
+    objectFile.close();
+    return;
+}
 
 void modRecordAux(vector<string> symbols, 
         vector<vector<string> > tokenized,
@@ -559,8 +706,7 @@ void modRecordFormat4(vector<string> symbols,
     return;
 }
 
-void generateModificationRecord(vector<string> sourceCode, 
-        vector<vector<string> > tokenized, string file){
+void generateModificationRecord(vector<vector<string> > tokenized, string file){
 
     const unsigned int size = 30;
     unsigned int count;
@@ -589,8 +735,7 @@ void generateModificationRecord(vector<string> sourceCode,
     return;
 }
 
-void generateEndRecord(vector<string> sourceCode, 
-        vector<vector<string> > tokenized, string file){
+void generateEndRecord(vector<vector<string> > tokenized, string file){
     string temp = file.substr(0, file.find(".",0));
     temp += ".obj";
 
@@ -672,12 +817,12 @@ void readFileObjectFile(const char* input){
     }
     file.close();
 
-    generateHeaderRecord(sourceCode, tokenized, input);
-    generateDefinitionRecord(sourceCode, tokenized, input);
-    generateReferenceRecord(sourceCode, tokenized, input);
-
-    generateModificationRecord(sourceCode, tokenized, input);
-    generateEndRecord(sourceCode, tokenized, input);
+    generateHeaderRecord(tokenized, input);
+    generateDefinitionRecord(tokenized, input);
+    generateReferenceRecord(tokenized, input);
+    generateTextRecord(tokenized, input);
+    generateModificationRecord(tokenized, input);
+    generateEndRecord(tokenized, input);
     
     return;
 }

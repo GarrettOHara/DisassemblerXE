@@ -1,3 +1,91 @@
+TextRecord FUNCTION code
+
+
+size = 0;
+        cout << "T"
+                   << "^"
+                   << setw(6)
+                   << setfill('0')
+                   << memory;
+        while(size < textSize){
+            if(tokenized[i].size() == 5){                   //Column 2 present
+                
+                if(tokenized[i][4].size() > 6){
+                    if(size+4 < textSize){
+                        cout << "^"
+                           << tokenized[i][4];
+                        size += 4; memory += 4; i++;
+                    } else{
+                        i--;                    //Decrement i to not skip this line, just put it on next
+                        size+=4;
+                    }
+                }else{ 
+                    if(size+3 < textSize){
+                        cout << "^"
+                           << tokenized[i][4];
+                        size += 3; memory += 3; i++;
+                    } else {
+                        i--;
+                        size+=4;
+                    }
+                }
+
+            } else if(tokenized[i].size() == 4){            //Column 2 not present
+
+                if(tokenized[i][3].size() > 6){
+                    if(size+4 < textSize){
+                        cout << "^"
+                           << tokenized[i][3];
+                        size += 4; memory += 4; i++;
+                    } else {
+                        i--;
+                        size+=4;
+                    }
+                }else{ 
+                    if(size+3 < textSize){
+                        cout << "^"
+                           << tokenized[i][3];
+                        size += 3; memory += 3; i++;
+                    } else {
+                        i--;
+                        size+=4;
+                    }
+                }
+
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // This function sucks balls
 int testPrint(const char* input){
     std::ifstream file(input);
