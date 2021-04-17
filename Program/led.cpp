@@ -117,30 +117,6 @@ int printInstructions(){
 	return;
  }
 
-/*
-    Idea on indetifying what is in each column
-    - we already have every string in a 2D vector, but not all the indexes and types match up
-    - so we are going to compare each line at certain indexes and determine if there is a space or a char 
-    - and depending on that we should know what goes where into the struct values, probs with a lot of if statments unfortantely
-    - index 8 = labels, index 16/17 = instruction, index 25/26 = arguments, index 51 = address
-*/
- void printIndexes(vector<string> sourceCode){
-     printf("Testing Indexes\n");
-     printf("-------------------------\n");
-     string line;
-     for(int i = 3; i < 5; i++){
-        string line (sourceCode[i].c_str());
-        cout << "Char at index 8, labels: " << line.at(8) << endl;
-        cout << "Char at index 16, instructions: "<< line.at(16) << endl;
-        cout << "Char at index 17, instructions: " << line.at(17) << endl;
-        cout << "Char at index 25, arguments: " << line.at(25) << endl;
-        cout << "Char at index 26, arguments: " << line.at(26) << endl;
-        cout << "Char at index 51, object code: " << line.at(51) << endl;
-	}
-    printf("-------------------------\n");
-    return;
- }
-
 void printESTAB(){
     ofstream ESTABfile;
     ESTABfile.open("ESTAB.st");
@@ -216,14 +192,7 @@ void parseESTAB(){
 }
 
 void generateESTAB(vector<string> vec, string instruction){
-    /**
-     * This function needs to parse the lines vector for
-     * EXTDEF and EXTREF then adds all the symbols defined here
-     * to the ESTAB with the addresses realative to the program.
-     * 
-     * When the symbol is parsed in the first pass of the linker, the 
-     * actual address is updated in the ESTAB
-     **/
+    
     ESTABdata data;
     
     if(vec.size() == 0 || vec[0] == ".")
