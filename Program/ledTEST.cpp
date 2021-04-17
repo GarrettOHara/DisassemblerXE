@@ -299,10 +299,13 @@ void generateHeaderRecord(vector<vector<string> > tokenized, string file){
             string len(streamB.str());
 
             objectFile << "H"
+                 << "^"
                  << reference
+                 << "^"
                  << setfill('0')
                  << setw(6)
                  << addy
+                 << "^"
                  << setw(6)
                  << len
                  << endl;
@@ -334,7 +337,9 @@ void generateDefinitionRecord(vector<vector<string> > tokenized, string file){
                 stream << hex << address;
                 string addy(stream.str());
 
-                objectFile << symbols[i]
+                objectFile << "^"
+                           << symbols[i]
+                           << "^"
                            << setw(6)
                            << setfill('0')
                            << addy;
@@ -362,7 +367,8 @@ void generateReferenceRecord(vector<vector<string> > tokenized, string file){
             objectFile << "R";
             vector<string> symbols = split(tokenized[i][2], ',');
             for(int i = 0; i < symbols.size(); i++){
-                objectFile << symbols[i];
+                objectFile << "^"
+                           << symbols[i];
             }
             objectFile << endl;
         }
@@ -447,19 +453,22 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
         string SIZE(streamB.str());
 
         objectFile << "T" 
+             << "^" 
              << setw(6) 
              << setfill('0') 
              << MEMORY
 
+             << "^" 
              << setw(2) 
              << setfill('0') 
              << SIZE;
 
         for(int j = 0; j < codes.size(); j++){
-            objectFile << codes[j];
+            objectFile << "^"
+                 << codes[j];
         }
         objectFile << endl;
-        
+        cout << tokenized.size() << ": " << i << endl;
         tempMem = memory;
         size = 0;
         codes.clear();
@@ -472,10 +481,10 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
     streamC << hex << programLength;
     string PROGLENGTH(streamC.str());
 
-    objectFile << "T"
+    objectFile << "T" << "^"
          << setw(6) << setfill('0') 
-         << PROGLENGTH
-         << "03"
+         << PROGLENGTH << "^"
+         << "03" << "^"
          << setw(6) << setfill('0') 
          << tokenized[programSize][3] 
          << endl;
@@ -514,10 +523,13 @@ void modRecordAux(vector<string> symbols,
                 string addy(stream.str());
 
                 objectFile << "M"
+                        << "^"
                         << setw(6)
                         << setfill('0')
                         << addy//tokenized[i][0]
+                        << "^"
                         << "05"
+                        << "^"
                         << "+"
                         << arguments[k]
                         << endl;
@@ -560,10 +572,13 @@ void modRecordFormat4(vector<string> symbols,
     string addy(stream.str());
 
     objectFile << "M"
+            << "^"
             << setw(6)
             << setfill('0')
             << addy
+            << "^"
             << "05"
+            << "^"
             << "+"
             << programName
             << endl;
@@ -629,6 +644,7 @@ void generateEndRecord(vector<vector<string> > tokenized, string file){
                 address = tokenized[j][0];
             if(address != ""){
                 objectFile << "E"
+                           << "^"
                            << address
                            << endl;
                 break;
