@@ -9,19 +9,15 @@
 #include <stdio.h>
 #include <string>
 #include <iomanip>
-#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <map>
 #include <vector>
-#include <set>
 #include <algorithm>
 
 using namespace std;
-
-string programName;
 
 /**
  * Non initialized values could run into a runtime error
@@ -33,57 +29,6 @@ struct ESTABdata{
     unsigned int address;
     unsigned int length;    
 };
-
-/**
- * Object File Line is the Parent Struct of all of the 
- * differnt types of object file liens there can be
- * 
- * each object record posesses different attributes and needs
- * its own struct
- **/
-struct ObjectFileLine{
-    struct HeaderRecord{
-        string controlSectionName;
-        unsigned int actualAddress;
-        unsigned int length;
-    };
-    struct DefinitionRecord{
-        vector<string> symbols;
-        vector<unsigned int> addresses;
-    };
-    struct ReferenceRecord{
-        vector<string> symbols;
-    };
-    struct TextRecord{
-        unsigned int relativeAddress;
-        string symbolName;
-        string instruction;
-        vector<string> arguments;
-        vector<unsigned int> objectCodes;
-    };
-    struct ModificationRecord{
-        unsigned int length;
-        unsigned int nibbles;
-        string mod;
-    };
-    struct EndRecord{
-        unsigned int address;
-    };
-    struct HeaderRecord header;
-    struct DefinitionRecord definition;
-    struct ReferenceRecord reference;
-    struct TextRecord text;
-    struct ModificationRecord modification;
-    struct EndRecord end;
-
-    unsigned int relativeAddress;   
-};
-
-/**
- * This vector holds all of the instructions in a source code file
- * - Each element is an Instruction struct
- **/
-vector<ObjectFileLine> listingFile;
 
 /**
  * This Unordered map Data Structure holds the Symbol name as the key
@@ -104,6 +49,7 @@ vector<string> insertionOrder;
 vector<vector<string> > lines;
 /**
  * This vector stores all of the lines of the source code as strings
+ * REMOVE THIS AND TRIVIAL PRINT FUNCTIONS AT END
  **/
 vector<string> testSourceCode;
 
@@ -111,7 +57,7 @@ vector<string> testSourceCode;
  * This variable updates the global memory scope when reading listing files
  **/
 unsigned int memoryLocation = 0;
-unsigned int MEMORY;
+string programName;
 
 vector<string> split(const string str, char delim) {
     vector<string> result;
@@ -349,7 +295,6 @@ void generateESTAB(vector<string> vec, string instruction){
         converter >> hex >> length;
         
         ESTAB[programName].length = length+3;
-        MEMORY = length+3;
         if(memoryLocation == 0)
             memoryLocation = length+3;
         else
@@ -586,7 +531,6 @@ void modRecordFormat4(vector<string> symbols,
     //cause already made
     if(find(symbols.begin(), symbols.end(), 
             arguments[0]) != symbols.end()){
-        cout << "RETURNING" << endl;
         return;     
     }
 
@@ -630,16 +574,13 @@ void generateModificationRecord(vector<string> sourceCode,
             symbols = split(tokenized[i][2], ',');
         }
         else if(symbols.size() != 0){           //enter if external refs present
-            int temp = tokenized[i].size()-1;
-            //string tempStr = tokenized[i][]
-            cout << sourceCode[i] << endl;
-            cout << "Object Code: " << tokenized[i][temp].size() << endl;
             
             if(tokenized[i].size() == 5){                   //Column 2 present
                 modRecordAux(symbols,tokenized,file,i,3);
             } else if(tokenized[i].size() == 4){            //Column 2 not present
                 modRecordAux(symbols,tokenized,file,i,2);
             }
+            int temp = tokenized[i].size()-1;
             if(tokenized[i][temp].size() > 6)        //Format 4 instruction
                 modRecordFormat4(symbols,tokenized,file,i,2);
 
@@ -687,45 +628,7 @@ void generateEndRecord(vector<string> sourceCode,
     return;
 }
 
-/**
- * How to address column two of the listing file
- * 
- * Create a cosntant time lookup hashtable to check if the second element in the 
- * vector is a instruction 
- * if its not then its either the prorgam name or a custom (programmer defined) symbol
- * 
- * this will allow us to set the correct field for the struct and store it in the vector
- * Note 4/8: not making multiple instances of this struct, creating one and overriding it each time,
- * wherever you initialize you can also use it in the scope of the function, 
- * but I wonder if we can still access it if we pass the struct to other functions, maybe have the function return a struct?
- * Note 4/9: make new function for header record (needs starting address and length of program)
- * //2D vector to compare
- **/
-ObjectFileLine instructionParse(vector<string> sourceCode, 
-        vector<vector<string> > tokenized){
-    struct ObjectFileLine structData;
 
-    //call header, definiton, ref record here
-
-    //line 4 is where program starts, estab take getting taken care of separately
-    //do avoid hard coding int 4, find where First starts
-    //3/10: this will need to be a nested for loop?
-    for(int i = 4; i < sourceCode.size(); i++){
-        //if first item in index = END directive, special case, else first item = rel address
-        // string str = "END";
-        // if(str.compare(tokenized.at(i).at(0) == 0)){
-        //     generateEndRecord(sourceCode, tokenized);
-        //     break;
-        // }
-        if(tokenized.at(i).at(0) == "END"){
-            //generateEndRecord(sourceCode, tokenized);
-            break;
-        }
-        //generateTextRecord(index, sourceCode, tokenized);
-    }
-        
-    return structData;    
-}
 int readFileESTAB(const char* input){
     ifstream file(input);
     string line;
@@ -751,7 +654,6 @@ int readFileESTAB(const char* input){
 }
 
 void readFileObjectFile(const char* input){
-    map<string,ObjectFileLine> instructionMap;
 
     string temp = input;
     string fileName = temp.substr(0,temp.find(".",0));
@@ -770,22 +672,13 @@ void readFileObjectFile(const char* input){
     }
     file.close();
 
-    // string temp = input;
-    // temp += ".obj";
-
-    // ofstream objectFile;
-    // objectFile.open(temp.c_str());
-
     generateHeaderRecord(sourceCode, tokenized, input);
     generateDefinitionRecord(sourceCode, tokenized, input);
     generateReferenceRecord(sourceCode, tokenized, input);
 
     generateModificationRecord(sourceCode, tokenized, input);
     generateEndRecord(sourceCode, tokenized, input);
-    // instructionParse(sourceCode, tokenized);
-    // //Call the generate Object file function here
-    // printIndexes(sourceCode);
-    //objectFile.close();
+    
     return;
 }
 
@@ -809,44 +702,3 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-/**
- * This is a notes section
- * 
- * main method must be at bottom. Probably just when not in a class.
- * 
- * ELF/ in the outpusourceCodeddress of the symbol
- * 
- * 
- * Helpful Resources: 
- * Page 143 in the textbook (159 of PDF)
- * Shows the "toString" of the ESTAB which can also be refered to as load map
- * 
- * 
- * Object File
- * 
- * 
- * Question: 
- *  - How do we know how long a text record line is
- *  - How do we know what kind of instruction something is format 3,4?
- *  - Is calculating the actual address really just the actual address of the
- *    program + the realative address of the symbol
- *  - How do we make the header record for the Object File
- *  - Do we only add the object code for the main program and then put the
- *    modification records for the external symbol references
- * 
- * 
- * Edge Cases: 
- *  - External Symbol that is not defined in the EXDEF is encountered
- *    program must cease execution giving the error (I can see him doing this case)
- *  - What if first pass we notice that the first file in the arguments list isnt main
- *    program?
- *      - I would assume hault execution and sepcify that you need ot have the main program
- *        first would be enough
- * 
- * To Do's:
- *  - understand how texts records are generated (and header, mod, and end records)
- *  - how to read and store important values from listing files/source code
- *  - Garret idea: working on split function that will split ever line into strings and each 
- * line will be stored in a vector of vectors 
- *  - let's start brainstorming what exactly the object file needs
- **/
