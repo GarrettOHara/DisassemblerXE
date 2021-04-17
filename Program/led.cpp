@@ -125,6 +125,27 @@ vector<string> split(const string str, char delim) {
     }
     return result;
 }
+vector<string> splitString(const string str){
+    vector<string> tokens;
+    string alpha;
+    for (int i=0; i<str.length(); i++)
+    {
+        if (isdigit(str[i]))
+            alpha.push_back(str[i]);
+        else if((str[i] >= 'A' && str[i] <= 'Z') ||
+                (str[i] >= 'a' && str[i] <= 'z'))
+            alpha.push_back(str[i]);
+        else{
+            if(alpha != ""){
+                tokens.push_back(alpha);
+                alpha.clear();
+            }
+        }
+    }
+    if(str!="")
+        tokens.push_back(alpha);
+    return tokens;
+}
 
 int printInstructions(){
     printf("Instructions Deliminated:\n");
@@ -446,78 +467,174 @@ void generateReferenceRecord(vector<string> sourceCode,
     return;
 }
 
-//we generate one line of the text record
-//should return new index
-//created 3/10 by viv
-int generateTextRecord(int index, vector<string> sourceCode, 
-        vector<vector<string> > tokenized){
-    ObjectFileLine data;
-    //will need some sort of counter to make sure we are not going over size IE
-    int counter;
+// //we generate one line of the text record
+// //should return new index
+// //created 3/10 by viv
+// int generateTextRecord(int index, vector<string> sourceCode, 
+//         vector<vector<string> > tokenized){
+//     ObjectFileLine data;
+//     //will need some sort of counter to make sure we are not going over size IE
+//     int counter;
 
-    //store rel address
-    unsigned int relAddress = atoi((tokenized.at(index).at(0).c_str()));
-    data.text.relativeAddress = relAddress;
+//     //store rel address
+//     unsigned int relAddress = atoi((tokenized.at(index).at(0).c_str()));
+//     data.text.relativeAddress = relAddress;
 
-    //what will our loop condition be?
-    //counter < IE (hex))
-    while(true)
-    {
-        vector<string> instruct = tokenized.at(index);
-        //if line has a symbol name then index 1 = symnbol name and index 2 = instruction
-        //
-        string line = sourceCode[index];
-        if(line.at(8) != ' ')
-        {
-            data.text.symbolName = tokenized[index][1];
-            data.text.instruction = tokenized[index][2];
-            data.text.arguments.push_back(tokenized[index][3]);
-            //not always the case for this need to check bounds
-            if(instruct.size() > 3){
-                stringstream temp(tokenized[index][4]);
-                unsigned int x = 0;
-                temp >> x;
-                data.text.objectCodes.push_back(x);
-            }
-        }
+//     //what will our loop condition be?
+//     //counter < IE (hex))
+//     while(true)
+//     {
+//         vector<string> instruct = tokenized.at(index);
+//         //if line has a symbol name then index 1 = symnbol name and index 2 = instruction
+//         //
+//         string line = sourceCode[index];
+//         if(line.at(8) != ' ')
+//         {
+//             data.text.symbolName = tokenized[index][1];
+//             data.text.instruction = tokenized[index][2];
+//             data.text.arguments.push_back(tokenized[index][3]);
+//             //not always the case for this need to check bounds
+//             if(instruct.size() > 3){
+//                 stringstream temp(tokenized[index][4]);
+//                 unsigned int x = 0;
+//                 temp >> x;
+//                 data.text.objectCodes.push_back(x);
+//             }
+//         }
             
-        else{
-            data.text.instruction = tokenized[index][1]; //if no second column instruction is at index 1 of instruct vector
-            data.text.arguments.push_back(tokenized[index][2]);
-            //check for bounds
-            if(instruct.size() > 3){
-                stringstream temp(tokenized[index][3]);
-                unsigned int x = 0;
-                temp >> x;
-                data.text.objectCodes.push_back(x);
+//         else{
+//             data.text.instruction = tokenized[index][1]; //if no second column instruction is at index 1 of instruct vector
+//             data.text.arguments.push_back(tokenized[index][2]);
+//             //check for bounds
+//             if(instruct.size() > 3){
+//                 stringstream temp(tokenized[index][3]);
+//                 unsigned int x = 0;
+//                 temp >> x;
+//                 data.text.objectCodes.push_back(x);
+//             }
+//         }
+//         //also need to be filling the TextRecord struct of every loop
+//         //increment index 
+//         index++;
+//     }
+//     return index;   
+// }
+
+void modRecordAux(vector<string> symbols, 
+        vector<vector<string> > tokenized,
+        string file, int i, int index){
+
+    string temp = file.substr(0, file.find(".",0));
+    temp += ".obj";    
+    ofstream objectFile;
+    objectFile.open(temp.c_str(), ios_base::app);
+
+    string str = tokenized[i][index];
+    vector<string> arguments = splitString(str);
+    
+    if(arguments.size() == 0 || arguments[0] == ""){
+        return;
+    }
+    
+    for(int j = 0; j < symbols.size(); j++){
+        for(int k = 0; k < arguments.size(); k++){
+            if(symbols[j] == arguments[k]){
+                objectFile << "M"
+                        << "^"
+                        << setw(6)
+                        << setfill('0')
+                        << tokenized[i][0]
+                        << "^"
+                        << "05"
+                        << "^"
+                        << "+"
+                        << arguments[k]
+                        << endl;
             }
         }
-        //also need to be filling the TextRecord struct of every loop
-        //increment index 
-        index++;
     }
-    return index;   
+    objectFile.close();
+    return;
+}
+void modRecordFormat4(vector<string> symbols, 
+        vector<vector<string> > tokenized,
+        string file, int i, int index){
+
+    string temp = file.substr(0, file.find(".",0));
+    temp += ".obj";    
+    ofstream objectFile;
+    objectFile.open(temp.c_str(), ios_base::app);
+
+    string str = tokenized[i][index];
+    vector<string> arguments = splitString(str);
+    
+    if(arguments.size() == 0 || arguments[0] == ""){
+        return;
+    }
+
+    //if argument is in EXTREF do not print format 4 instrct, 
+    //cause already made
+    if(find(symbols.begin(), symbols.end(), 
+            arguments[0]) != symbols.end()){
+        cout << "RETURNING" << endl;
+        return;     
+    }
+
+    unsigned int address;
+    istringstream converter(tokenized[i][0].c_str());
+    converter >> hex >> address;
+    address+=1;
+
+    stringstream stream;
+    stream << hex << address;
+    string addy(stream.str());
+
+    objectFile << "M"
+            << "^"
+            << setw(6)
+            << setfill('0')
+            << addy
+            << "^"
+            << "05"
+            << "^"
+            << "+"
+            << programName
+            << endl;
+
+    objectFile.close();
+    return;
 }
 
 void generateModificationRecord(vector<string> sourceCode, 
         vector<vector<string> > tokenized, string file){
-    string temp = file.substr(0, file.find(".",0));
-    temp += ".obj";
 
-    ofstream objectFile;
-    objectFile.open(temp.c_str(), ios_base::app);
-
-
-    /**
-     * Two pass approach
-     * 
-     * Create a struct which has a memory address as an unsigned int, string for the symbol/object code 
-     **/
+    const unsigned int size = 30;
+    unsigned int count;
+    vector<string> symbols;
     for(int i = 0; i < tokenized.size(); i++){
-        
+        if(tokenized[i][0] == ".")              //Comment
+            continue;
+        else if(tokenized[i].size() < 3)        //End record
+            continue;
+        else if(tokenized[i][1] == "EXTREF"){   //populate external symbols 
+            symbols = split(tokenized[i][2], ',');
+        }
+        else if(symbols.size() != 0){           //enter if external refs present
+            int temp = tokenized[i].size()-1;
+            //string tempStr = tokenized[i][]
+            cout << sourceCode[i] << endl;
+            cout << "Object Code: " << tokenized[i][temp].size() << endl;
+            
+            if(tokenized[i].size() == 5){                   //Column 2 present
+                modRecordAux(symbols,tokenized,file,i,3);
+            } else if(tokenized[i].size() == 4){            //Column 2 not present
+                modRecordAux(symbols,tokenized,file,i,2);
+            }
+            if(tokenized[i][temp].size() > 6)        //Format 4 instruction
+                modRecordFormat4(symbols,tokenized,file,i,2);
+
+        }
     }
-    
-    objectFile.close();
     return;
 }
 
@@ -652,6 +769,8 @@ void readFileObjectFile(const char* input){
     generateHeaderRecord(sourceCode, tokenized, input);
     generateDefinitionRecord(sourceCode, tokenized, input);
     generateReferenceRecord(sourceCode, tokenized, input);
+
+    generateModificationRecord(sourceCode, tokenized, input);
     generateEndRecord(sourceCode, tokenized, input);
     // instructionParse(sourceCode, tokenized);
     // //Call the generate Object file function here
@@ -674,8 +793,8 @@ int main(int argc, char *argv[]){
         readFileESTAB(argv[i]);
         readFileObjectFile(argv[i]);
     }
-    printInstructions();
-    printSourceCode();
+    // printInstructions();
+    // printSourceCode();
 
     return 0;
 }
