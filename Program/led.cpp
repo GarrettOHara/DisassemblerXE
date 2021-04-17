@@ -539,11 +539,21 @@ void modRecordAux(vector<string> symbols,
     for(int j = 0; j < symbols.size(); j++){
         for(int k = 0; k < arguments.size(); k++){
             if(symbols[j] == arguments[k]){
+
+                unsigned int address;
+                istringstream converter(tokenized[i][0].c_str());
+                converter >> hex >> address;
+                address+=1;
+
+                stringstream stream;
+                stream << hex << address;
+                string addy(stream.str());
+
                 objectFile << "M"
                         << "^"
                         << setw(6)
                         << setfill('0')
-                        << tokenized[i][0]
+                        << addy//tokenized[i][0]
                         << "^"
                         << "05"
                         << "^"
