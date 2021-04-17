@@ -511,17 +511,9 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
             continue;
         
         while(true){
-            // cout << "i: " << i << endl;
-            // for(int j = 0; j < tokenized[i].size(); j++)
-            //     cout << tokenized[i][j] << endl;
-            //     cout << "\n\n";
-            // for(int j = 0; j < codes.size(); j++){
-            //     cout <<  codes[j] << endl;
-            // }
 
-            if(i == tokenized.size()){
+            if(i == tokenized.size())                //if i is out of range
                 break;
-            }
             if(tokenized[i][0] == "."){              //Comment
                 i++; continue;
             }
@@ -529,7 +521,7 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
                 i++; continue;
             }
 
-            if(tokenized[i].size()==5){        //column 2 present
+            if(tokenized[i].size()==5){             //column 2 present
                 string str = tokenized[i][4];
                 if(str.size() > 6){
                     if(size+4 <= textSize){
@@ -544,7 +536,7 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
                     }else
                         break;
                 }
-            }else{                          //column 2 not present
+            }else{                                  //column 2 not present
                 string str = tokenized[i][3];
                 if(str.size() > 6){
                     if(size+4 <= textSize){
@@ -584,7 +576,6 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
             cout << "^"
                  << codes[j];
         }
-        
         cout << endl;
 
         tempMem = memory;
