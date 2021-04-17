@@ -409,59 +409,6 @@ void generateReferenceRecord(vector<vector<string> > tokenized, string file){
     return;
 }
 
-// //we generate one line of the text record
-// //should return new index
-// //created 3/10 by viv
-// int generateTextRecord(int index, vector<string> sourceCode, 
-//         vector<vector<string> > tokenized){
-//     ObjectFileLine data;
-//     //will need some sort of counter to make sure we are not going over size IE
-//     int counter;
-
-//     //store rel address
-//     unsigned int relAddress = atoi((tokenized.at(index).at(0).c_str()));
-//     data.text.relativeAddress = relAddress;
-
-//     //what will our loop condition be?
-//     //counter < IE (hex))
-//     while(true)
-//     {
-//         vector<string> instruct = tokenized.at(index);
-//         //if line has a symbol name then index 1 = symnbol name and index 2 = instruction
-//         //
-//         string line = sourceCode[index];
-//         if(line.at(8) != ' ')
-//         {
-//             data.text.symbolName = tokenized[index][1];
-//             data.text.instruction = tokenized[index][2];
-//             data.text.arguments.push_back(tokenized[index][3]);
-//             //not always the case for this need to check bounds
-//             if(instruct.size() > 3){
-//                 stringstream temp(tokenized[index][4]);
-//                 unsigned int x = 0;
-//                 temp >> x;
-//                 data.text.objectCodes.push_back(x);
-//             }
-//         }
-            
-//         else{
-//             data.text.instruction = tokenized[index][1]; //if no second column instruction is at index 1 of instruct vector
-//             data.text.arguments.push_back(tokenized[index][2]);
-//             //check for bounds
-//             if(instruct.size() > 3){
-//                 stringstream temp(tokenized[index][3]);
-//                 unsigned int x = 0;
-//                 temp >> x;
-//                 data.text.objectCodes.push_back(x);
-//             }
-//         }
-//         //also need to be filling the TextRecord struct of every loop
-//         //increment index 
-//         index++;
-//     }
-//     return index;   
-// }
-
 void generateTextRecord(vector<vector<string> > tokenized, string file){
     string temp = file.substr(0, file.find(".",0));
     temp += ".obj";
@@ -473,34 +420,7 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
     unsigned int memory=0;
     unsigned int tempMem=0;
     vector<string> codes;
-    /**
-     * NEW APPROACH: 
-     * Parse lines to see what index of i to move to
-     * store in something, store memory counter for after memory location
-     * 
-     * memory gets updated with each object code
-     * textSize is the constant for each size fo the line
-     * 
-     * for each op code
-     * size keeps track of current line
-     * put op code in codes
-     * 
-     * break wile loop when size !<= textSize
-     * print out contents of codes
-     * 
-     * T^tempMem^size^codes...
-     * use tempMem as the previous location
-     * size as the counter for that line
-     * codes contains all op codes for line
-     * 
-     * clear codes
-     * tempMem = memory
-     * size = 0
-     * 
-     * repeat
-     * 
-     * 
-     **/
+    
     for(int i = 4; i < tokenized.size(); i++){
         
         if(tokenized[i][0] == ".")              //Comment
