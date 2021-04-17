@@ -562,7 +562,7 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
         stringstream streamB;
         streamB << hex << size;
         string SIZE(streamB.str());
-        //objectFile << file << endl;
+
         objectFile << "T" 
              << "^" 
              << setw(6) 
@@ -599,8 +599,6 @@ void generateTextRecord(vector<vector<string> > tokenized, string file){
          << setw(6) << setfill('0') 
          << tokenized[programSize][3] 
          << endl;
-    //objectFile << "\n\n";
-    
 
     objectFile.close();
     return;
